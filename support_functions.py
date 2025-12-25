@@ -59,15 +59,27 @@ def create_dscm_frame(parent):
         )
         lbl.place(x=20, y=y_pos)
 
-        ent = ctk.CTkEntry(
-            dscm_frame,
-            width=200,
-            fg_color="white",
-            text_color="black",
-            corner_radius=8
-        )
-        ent.place(x=180, y=y_pos)
+        
+        # 🔹 ComboBox only for "Cash With"
+        if field == "Cash With":
+            widget = ctk.CTkComboBox(
+                dscm_frame,
+                width=200,
+                values=["COUNTER", "IOB-ACCOUNT", "TEKNIX" , "BETA-ACCOUNT" ,"CUSTOMER" , "OTHERS"],
+                fg_color="white",
+                text_color="black",
+                corner_radius=8
+            )
+        else:
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                corner_radius=8
+            )
 
+        widget.place(x=180, y=y_pos)
         y_pos += 50  # move down for next field
 
     # ---------- Buttons: Save + Cancel ----------
