@@ -32,18 +32,18 @@ def create_side_frame(parent):
 
     return side_frame
 
-def create_main_frame(parent):
+def create_dscm_frame(parent):
     # main_frame=ctk.CTkFrame(window,fg_color=window.cget('fg_color'))
-    main_frame = ctk.CTkFrame(parent, fg_color='grey')
+    dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
 
     # ---------- Labels + Textboxes Data ----------
     fields = [
         "FTTH No",
         "Name",
+        "Contact No",
         "Bill Amount",
         "Cash Received",
-        "Balance To Customer",
-        "Balance Pending",
+        "Balance ",
         "Cash With",
         "Remarks"
     ]
@@ -52,7 +52,7 @@ def create_main_frame(parent):
 
     for field in fields:
         lbl = ctk.CTkLabel(
-            main_frame,
+            dscm_frame,
             text=field,
             font=("Arial", 15),
             text_color="white"
@@ -60,7 +60,7 @@ def create_main_frame(parent):
         lbl.place(x=20, y=y_pos)
 
         ent = ctk.CTkEntry(
-            main_frame,
+            dscm_frame,
             width=200,
             fg_color="white",
             text_color="black",
@@ -72,7 +72,7 @@ def create_main_frame(parent):
 
     # ---------- Buttons: Save + Cancel ----------
     save_btn = ctk.CTkButton(
-        main_frame,
+        dscm_frame,
         text="Save",
         width=100,
         fg_color="green",
@@ -81,7 +81,7 @@ def create_main_frame(parent):
     save_btn.place(x=60, y=y_pos + 20)
 
     cancel_btn = ctk.CTkButton(
-        main_frame,
+        dscm_frame,
         text="Cancel",
         width=100,
         fg_color="red",
@@ -90,4 +90,4 @@ def create_main_frame(parent):
     cancel_btn.place(x=200, y=y_pos + 20)
 
 
-    return main_frame
+    return dscm_frame
