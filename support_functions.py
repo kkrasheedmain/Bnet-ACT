@@ -82,10 +82,10 @@ def create_dscm_frame(parent):
         widget.place(x=180, y=y_pos)
         y_pos += 50  # move down for next field
 
-    # ---------- Buttons: Save + Cancel ----------
+    # ---------- Buttons: Check + Cancel ----------
     save_btn = ctk.CTkButton(
         dscm_frame,
-        text="Save",
+        text="Check",
         width=100,
         fg_color="green",
         text_color="white",

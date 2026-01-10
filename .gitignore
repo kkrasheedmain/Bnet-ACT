@@ -6,6 +6,11 @@
 __pycache__/
 *.pyc
 *.pyo
+credentials.json
+delete-gsheet.py
+delete-file.py
+
+
 
 
 
