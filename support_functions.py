@@ -31,66 +31,197 @@ def create_side_frame(parent):
         btn.place(x=5 if y >= 330 else 10, y=y)
 
     return side_frame
+#
+# def create_dscm_frame(parent):
+#     # main_frame=ctk.CTkFrame(window,fg_color=window.cget('fg_color'))
+#     dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
+#
+#     # ---------- Labels + Textboxes Data ----------
+#     fields = [
+#         "FTTH No",
+#         "Name",
+#         "Contact No",
+#         "Bill Amount",
+#         "Cash Received",
+#         "Balance ",
+#         "Cash With",
+#         "Remarks"
+#     ]
+#
+#     y_pos = 30
+#     entries = {}
+#
+#     for field in fields:
+#         lbl = ctk.CTkLabel(
+#             dscm_frame,
+#             text=field,
+#             font=("Arial", 15),
+#             text_color="white"
+#         )
+#         lbl.place(x=20, y=y_pos)
+#
+#
+#         # 🔹 ComboBox only for "Cash With"
+#         if field == "Cash With":
+#             widget = ctk.CTkComboBox(
+#                 dscm_frame,
+#                 width=200,
+#                 values=["COUNTER", "IOB-ACCOUNT", "TEKNIX" , "BETA-ACCOUNT" ,"CUSTOMER" , "OTHERS"],
+#                 fg_color="white",
+#                 text_color="black",
+#                 corner_radius=8
+#             )
+#         else:
+#             widget = ctk.CTkEntry(
+#                 dscm_frame,
+#                 width=200,
+#                 fg_color="white",
+#                 text_color="black",
+#                 corner_radius=8
+#             )
+#
+#         widget.place(x=180, y=y_pos)
+#         y_pos += 50  # move down for next field
+#
+#     # ---------- Buttons: Check + Cancel ----------
+#     save_btn = ctk.CTkButton(
+#         dscm_frame,
+#         text="Check",
+#         width=100,
+#         fg_color="green",
+#         text_color="white",
+#     )
+#     save_btn.place(x=60, y=y_pos + 20)
+#
+#     cancel_btn = ctk.CTkButton(
+#         dscm_frame,
+#         text="Cancel",
+#         width=100,
+#         fg_color="red",
+#         text_color="white",
+#     )
+#     cancel_btn.place(x=200, y=y_pos + 20)
+#
+#
+#     return dscm_frame
 
+###########################
 def create_dscm_frame(parent):
-    # main_frame=ctk.CTkFrame(window,fg_color=window.cget('fg_color'))
     dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
+    dscm_frame.place(relwidth=1, relheight=1)
 
-    # ---------- Labels + Textboxes Data ----------
     fields = [
         "FTTH No",
         "Name",
         "Contact No",
         "Bill Amount",
         "Cash Received",
-        "Balance ",
+        "Balance",
         "Cash With",
         "Remarks"
     ]
 
+    entries = {}
     y_pos = 30
 
     for field in fields:
         lbl = ctk.CTkLabel(
-            dscm_frame,
-            text=field,
+            dscm_frame, text=field,
             font=("Arial", 15),
             text_color="white"
         )
         lbl.place(x=20, y=y_pos)
 
-        
-        # 🔹 ComboBox only for "Cash With"
         if field == "Cash With":
             widget = ctk.CTkComboBox(
                 dscm_frame,
                 width=200,
-                values=["COUNTER", "IOB-ACCOUNT", "TEKNIX" , "BETA-ACCOUNT" ,"CUSTOMER" , "OTHERS"],
+                values=["COUNTER", "IOB-ACCOUNT", "TEKNIX", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
                 fg_color="white",
-                text_color="black",
-                corner_radius=8
+                text_color="black"
             )
+            widget.set("COUNTER")
         else:
             widget = ctk.CTkEntry(
                 dscm_frame,
                 width=200,
                 fg_color="white",
-                text_color="black",
-                corner_radius=8
+                text_color="black"
             )
 
         widget.place(x=180, y=y_pos)
-        y_pos += 50  # move down for next field
+        entries[field] = widget
+        y_pos += 50
 
-    # ---------- Buttons: Check + Cancel ----------
-    save_btn = ctk.CTkButton(
+    # ---------- CHECK BUTTON ACTION ----------
+    def show_verification():
+        popup = ctk.CTkToplevel(parent)
+        popup.title("Verification")
+        popup.geometry("450x500")
+        popup.transient(parent)
+        popup.grab_set()  # 🔒 MODAL
+        popup.resizable(False, False)
+
+        popup_frame = ctk.CTkFrame(popup)
+        popup_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        popup_frame.columnconfigure(0, weight=1)
+        popup_frame.columnconfigure(1, weight=2)
+
+        title = ctk.CTkLabel(
+            popup_frame,
+            text="Verification Details",
+            font=("Arial", 18, "bold")
+        )
+        title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
+
+        row = 1
+        for field, widget in entries.items():
+            value = widget.get()
+
+            ctk.CTkLabel(
+                popup_frame,
+                text=field,
+                anchor="w"
+            ).grid(row=row, column=0, padx=10, pady=6, sticky="w")
+
+            ctk.CTkLabel(
+                popup_frame,
+                text=value,
+                anchor="w"
+            ).grid(row=row, column=1, padx=10, pady=6, sticky="w")
+
+            row += 1
+
+        # Buttons
+        btn_frame = ctk.CTkFrame(popup_frame)
+        btn_frame.grid(row=row, column=0, columnspan=2, pady=20)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Back",
+            width=100,
+            command=popup.destroy
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Confirm",
+            width=100,
+            fg_color="green",
+            command=lambda: [print("Confirmed"), popup.destroy()]
+        ).pack(side="left", padx=10)
+
+    # ---------- Buttons ----------
+    check_btn = ctk.CTkButton(
         dscm_frame,
         text="Check",
         width=100,
         fg_color="green",
         text_color="white",
+        command=show_verification
     )
-    save_btn.place(x=60, y=y_pos + 20)
+    check_btn.place(x=60, y=y_pos + 20)
 
     cancel_btn = ctk.CTkButton(
         dscm_frame,
@@ -98,8 +229,9 @@ def create_dscm_frame(parent):
         width=100,
         fg_color="red",
         text_color="white",
+        command=dscm_frame.destroy  # optional
     )
     cancel_btn.place(x=200, y=y_pos + 20)
 
-
     return dscm_frame
+
