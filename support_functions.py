@@ -80,7 +80,22 @@ def create_dscm_frame(parent):
         entries[field] = widget
         y_pos += 50
 
+        # ---------- VALIDATION FUNCTION ----------
+
+    def validate_entries():
+        for field, widget in entries.items():
+            value = widget.get().strip()
+
+            # Skip validation for ComboBox default if needed
+            if field != "Cash With" and value == "":
+                check_btn.configure(state="disabled")
+                return
+
+        check_btn.configure(state="normal")
+
+
     # ---------- CHECK BUTTON ACTION ----------
+
     def show_verification():
         popup = ctk.CTkToplevel(parent)
         popup.title("Verification")
@@ -146,15 +161,22 @@ def create_dscm_frame(parent):
         width=100,
         fg_color="green",
         text_color="white",
+        state="disabled",  # 🔒 initially disabled
         command=show_verification
     )
     check_btn.place(x=60, y=y_pos + 20)
+
+    for widget in entries.values():
+        widget.bind("<KeyRelease>", lambda event: validate_entries())
+
     ####################
 
     def clear_entries():
         for widget in entries.values():
             if hasattr(widget, "delete"):
                 widget.delete(0, "end")
+
+        validate_entries()  # 🔄 re-check after clearing
 
     cancel_btn = ctk.CTkButton(
         dscm_frame,
