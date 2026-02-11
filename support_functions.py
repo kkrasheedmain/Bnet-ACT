@@ -49,6 +49,29 @@ def create_dscm_frame(parent):
     ]
 
     entries = {}
+    ################
+    # ---------- FTTH VALIDATION ----------
+    def validate_ftth(new_value):
+        # Allow empty (so user can delete while typing)
+        if new_value == "":
+            return True
+
+        # Only digits allowed
+        if not new_value.isdigit():
+            return False
+
+        # Maximum 10 digits
+        if len(new_value) > 10:
+            return False
+        # First digit cannot be 0
+        if new_value.startswith("0"):
+            return False
+
+        return True
+
+    vcmd = (dscm_frame.register(validate_ftth), "%P")
+
+    ###############
     y_pos = 30
 
     for field in fields:
@@ -59,7 +82,18 @@ def create_dscm_frame(parent):
         )
         lbl.place(x=20, y=y_pos)
 
-        if field == "Cash With":
+        ############################
+        if field == "FTTH No":
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                validate="key",
+                validatecommand=vcmd
+            )
+
+        elif field == "Cash With":
             widget = ctk.CTkComboBox(
                 dscm_frame,
                 width=200,
@@ -68,6 +102,7 @@ def create_dscm_frame(parent):
                 text_color="black"
             )
             widget.set("COUNTER")
+
         else:
             widget = ctk.CTkEntry(
                 dscm_frame,
@@ -80,19 +115,22 @@ def create_dscm_frame(parent):
         entries[field] = widget
         y_pos += 50
 
-        # ---------- VALIDATION FUNCTION ----------
-
+    # ---------- VALIDATION FUNCTION ----------
     def validate_entries():
         for field, widget in entries.items():
             value = widget.get().strip()
 
-            # Skip validation for ComboBox default if needed
-            if field != "Cash With" and value == "":
+            if field == "FTTH No":
+                # Must be exactly 10 digits
+                if len(value) != 10:
+                    check_btn.configure(state="disabled")
+                    return
+
+            elif field != "Cash With" and value == "":
                 check_btn.configure(state="disabled")
                 return
 
         check_btn.configure(state="normal")
-
 
     # ---------- CHECK BUTTON ACTION ----------
 
@@ -165,9 +203,9 @@ def create_dscm_frame(parent):
         command=show_verification
     )
     check_btn.place(x=60, y=y_pos + 20)
-
-    for widget in entries.values():
-        widget.bind("<KeyRelease>", lambda event: validate_entries())
+    for field, widget in entries.items():
+        if field != "Cash With":
+            widget.bind("<KeyRelease>", lambda event: validate_entries())
 
     ####################
 
