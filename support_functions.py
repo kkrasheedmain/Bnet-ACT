@@ -105,22 +105,30 @@ def create_dscm_frame(parent):
         return True
 
     # ---------- AMOUNT VALIDATION ----------
-    def validate_amount(new_value):
+    def validate_amount(new_value, field_name=None):
         if new_value == "":
             return True
 
-        # Allow only numbers and one decimal point
         try:
             float(new_value)
         except ValueError:
             return False
 
-        return True
+        # Auto move from Bill Amount
+        if field_name == "Bill Amount" and new_value != "":
+            dscm_frame.after(10, lambda: entries["Cash Received"].focus())
 
+        return True
 
     vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
-    vcmd_amount = (dscm_frame.register(validate_amount), "%P")
+    vcmd_amount_bill = (
+        dscm_frame.register(lambda P: validate_amount(P, "Bill Amount")), "%P"
+    )
+
+    vcmd_amount_cash = (
+        dscm_frame.register(lambda P: validate_amount(P, "Cash Received")), "%P"
+    )
 
     #######################################################
     y_pos = 30
@@ -154,15 +162,28 @@ def create_dscm_frame(parent):
                 validatecommand=vcmd_contact
             )
 
-        elif field in ["Bill Amount", "Cash Received"]:
+
+        elif field == "Bill Amount":
             widget = ctk.CTkEntry(
                 dscm_frame,
                 width=200,
                 fg_color="white",
                 text_color="black",
                 validate="key",
-                validatecommand=vcmd_amount
+                validatecommand=vcmd_amount_bill
             )
+
+
+        elif field == "Cash Received":
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                validate="key",
+                validatecommand=vcmd_amount_cash
+            )
+
 
         elif field == "Balance":
             widget = ctk.CTkEntry(
@@ -211,8 +232,14 @@ def create_dscm_frame(parent):
         entries["Balance"].configure(state="normal")
         entries["Balance"].delete(0, "end")
         entries["Balance"].insert(0, f"{balance:.2f}")
-        entries["Balance"].configure(state="disabled")
 
+        # 🔴 Turn red if negative
+        if balance < 0:
+            entries["Balance"].configure(text_color="red")
+        else:
+            entries["Balance"].configure(text_color="black")
+
+        entries["Balance"].configure(state="disabled")
 
     # ---------- VALIDATION FUNCTION ----------
     def validate_entries():
