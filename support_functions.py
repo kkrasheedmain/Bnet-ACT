@@ -63,9 +63,14 @@ def create_dscm_frame(parent):
         # Maximum 10 digits
         if len(new_value) > 10:
             return False
+
         # First digit cannot be 0
         if new_value.startswith("0"):
             return False
+
+        # 🔥 Auto move to Name field when 10 digits entered
+        if len(new_value) == 10:
+            dscm_frame.after(10, lambda: entries["Name"].focus())
 
         return True
 
