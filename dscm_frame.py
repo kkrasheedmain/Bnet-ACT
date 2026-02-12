@@ -1,5 +1,10 @@
 import customtkinter as ctk
 
+import csv
+import os
+from datetime import datetime
+
+
 ###########################
 def create_dscm_frame(parent):
     dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
@@ -214,8 +219,26 @@ def create_dscm_frame(parent):
 
         check_btn.configure(state="normal")
 
-    # ---------- CHECK BUTTON ACTION ----------
+    ### Create CSV Save Function
+    def save_to_csv(data_dict):
+        file_name = "dscm_collection.csv"
 
+        file_exists = os.path.isfile(file_name)
+
+        with open(file_name, mode="a", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+
+            # Write header only if file does not exist
+            if not file_exists:
+                writer.writerow(["Date", "Time"] + list(data_dict.keys()))
+
+            now = datetime.now()
+            date_str = now.strftime("%Y-%m-%d")
+            time_str = now.strftime("%H:%M:%S")
+
+            writer.writerow([date_str, time_str] + list(data_dict.values()))
+
+    # ---------- CHECK BUTTON ACTION ----------
     def show_verification():
         popup = ctk.CTkToplevel(parent)
         popup.title("Verification")
@@ -271,9 +294,10 @@ def create_dscm_frame(parent):
             for field, widget in entries.items():
                 collected_data[field] = widget.get()
             print("Stored Data:", collected_data)
+            save_to_csv(collected_data)  # 🔥 SAVE TO CSV
             popup.destroy()
-            clear_entries()  # 🔥 RESET FORM
-            entries["FTTH No"].focus()  # 🔥 Put cursor back to first field
+            clear_entries()
+            entries["FTTH No"].focus()
 
         ctk.CTkButton(
             btn_frame,
