@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-import csv
+from openpyxl import Workbook, load_workbook
 import os
 from datetime import datetime
 
@@ -219,24 +219,33 @@ def create_dscm_frame(parent):
 
         check_btn.configure(state="normal")
 
-    ### Create CSV Save Function
-    def save_to_csv(data_dict):
-        file_name = "dscm_collection.csv"
+    ### Create Excel Save Function
+    def save_to_excel(data_dict):
+        folder_path = "D:/BETA-SOFT"
+        file_name = "beta_soft.xlsx"
+        full_path = os.path.join(folder_path, file_name)
+        os.makedirs(folder_path, exist_ok=True)
 
-        file_exists = os.path.isfile(file_name)
+        # If file exists → load it
+        if os.path.exists(full_path):
+            workbook = load_workbook(full_path)
+        else:
+            workbook = Workbook()
+        # If sheet "dscm" exists → use it
+        if "dscm" in workbook.sheetnames:
+            sheet = workbook["dscm"]
+        else:
+            sheet = workbook.create_sheet("dscm")
+            # Write header only first time
+            headers = ["Date", "Time"] + list(data_dict.keys())
+            sheet.append(headers)
 
-        with open(file_name, mode="a", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-
-            # Write header only if file does not exist
-            if not file_exists:
-                writer.writerow(["Date", "Time"] + list(data_dict.keys()))
-
-            now = datetime.now()
-            date_str = now.strftime("%Y-%m-%d")
-            time_str = now.strftime("%H:%M:%S")
-
-            writer.writerow([date_str, time_str] + list(data_dict.values()))
+        now = datetime.now()
+        date_str = now.strftime("%Y-%m-%d")
+        time_str = now.strftime("%H:%M:%S")
+        row_data = [date_str, time_str] + list(data_dict.values())
+        sheet.append(row_data)
+        workbook.save(full_path)
 
     # ---------- CHECK BUTTON ACTION ----------
     def show_verification():
@@ -294,7 +303,7 @@ def create_dscm_frame(parent):
             for field, widget in entries.items():
                 collected_data[field] = widget.get()
             print("Stored Data:", collected_data)
-            save_to_csv(collected_data)  # 🔥 SAVE TO CSV
+            save_to_excel(collected_data)
             popup.destroy()
             clear_entries()
             entries["FTTH No"].focus()
