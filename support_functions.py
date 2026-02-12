@@ -104,31 +104,22 @@ def create_dscm_frame(parent):
 
         return True
 
+
     # ---------- AMOUNT VALIDATION ----------
-    def validate_amount(new_value, field_name=None):
+    def validate_amount(new_value):
         if new_value == "":
             return True
 
         try:
             float(new_value)
+            return True
         except ValueError:
             return False
 
-        # Auto move from Bill Amount
-        if field_name == "Bill Amount" and new_value != "":
-            dscm_frame.after(10, lambda: entries["Cash Received"].focus())
-
-        return True
-
     vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
-    vcmd_amount_bill = (
-        dscm_frame.register(lambda P: validate_amount(P, "Bill Amount")), "%P"
-    )
+    vcmd_amount = (dscm_frame.register(validate_amount), "%P")
 
-    vcmd_amount_cash = (
-        dscm_frame.register(lambda P: validate_amount(P, "Cash Received")), "%P"
-    )
 
     #######################################################
     y_pos = 30
@@ -162,7 +153,6 @@ def create_dscm_frame(parent):
                 validatecommand=vcmd_contact
             )
 
-
         elif field == "Bill Amount":
             widget = ctk.CTkEntry(
                 dscm_frame,
@@ -170,9 +160,8 @@ def create_dscm_frame(parent):
                 fg_color="white",
                 text_color="black",
                 validate="key",
-                validatecommand=vcmd_amount_bill
+                validatecommand=vcmd_amount
             )
-
 
         elif field == "Cash Received":
             widget = ctk.CTkEntry(
@@ -181,9 +170,8 @@ def create_dscm_frame(parent):
                 fg_color="white",
                 text_color="black",
                 validate="key",
-                validatecommand=vcmd_amount_cash
+                validatecommand=vcmd_amount
             )
-
 
         elif field == "Balance":
             widget = ctk.CTkEntry(
@@ -335,6 +323,13 @@ def create_dscm_frame(parent):
     # Bind auto calculation
     entries["Bill Amount"].bind("<KeyRelease>", calculate_balance)
     entries["Cash Received"].bind("<KeyRelease>", calculate_balance)
+
+    # ---------- ENTER KEY NAVIGATION ----------
+    entries["Bill Amount"].bind("<Return>",
+        lambda event: entries["Cash Received"].focus())
+
+    entries["Cash Received"].bind("<Return>",
+        lambda event: entries["Balance"].focus())
 
     ####################
 
