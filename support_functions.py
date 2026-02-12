@@ -49,7 +49,7 @@ def create_dscm_frame(parent):
     ]
 
     entries = {}
-    ################
+    ###############################################
     # ---------- FTTH VALIDATION ----------
     def validate_ftth(new_value):
         # Allow empty (so user can delete while typing)
@@ -74,9 +74,32 @@ def create_dscm_frame(parent):
 
         return True
 
-    vcmd = (dscm_frame.register(validate_ftth), "%P")
+    # ---------- CONTACT VALIDATION ----------
+    def validate_contact(new_value):
+        if new_value == "":
+            return True
 
-    ###############
+        if not new_value.isdigit():
+            return False
+
+        if len(new_value) > 10:
+            return False
+
+        if new_value.startswith("0"):
+            return False
+
+        # Auto move to Bill Amount after 10 digits
+        if len(new_value) == 10:
+            dscm_frame.after(10, lambda: entries["Bill Amount"].focus())
+
+        return True
+
+
+
+    vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
+    vcmd_contact = (dscm_frame.register(validate_contact), "%P")
+
+    #######################################################
     y_pos = 30
 
     for field in fields:
@@ -95,7 +118,17 @@ def create_dscm_frame(parent):
                 fg_color="white",
                 text_color="black",
                 validate="key",
-                validatecommand=vcmd
+                validatecommand=vcmd_ftth
+            )
+
+        elif field == "Contact No":
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                validate="key",
+                validatecommand=vcmd_contact
             )
 
         elif field == "Cash With":
@@ -125,8 +158,7 @@ def create_dscm_frame(parent):
         for field, widget in entries.items():
             value = widget.get().strip()
 
-            if field == "FTTH No":
-                # Must be exactly 10 digits
+            if field in ["FTTH No", "Contact No"]:
                 if len(value) != 10:
                     check_btn.configure(state="disabled")
                     return
