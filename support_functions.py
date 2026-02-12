@@ -104,8 +104,23 @@ def create_dscm_frame(parent):
 
         return True
 
+    # ---------- AMOUNT VALIDATION ----------
+    def validate_amount(new_value):
+        if new_value == "":
+            return True
+
+        # Allow only numbers and one decimal point
+        try:
+            float(new_value)
+        except ValueError:
+            return False
+
+        return True
+
+
     vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
+    vcmd_amount = (dscm_frame.register(validate_amount), "%P")
 
     #######################################################
     y_pos = 30
@@ -118,7 +133,7 @@ def create_dscm_frame(parent):
         )
         lbl.place(x=20, y=y_pos)
 
-        ############################
+        ############################ Entry Creation Loop
         if field == "FTTH No":
             widget = ctk.CTkEntry(
                 dscm_frame,
@@ -138,6 +153,26 @@ def create_dscm_frame(parent):
                 validate="key",
                 validatecommand=vcmd_contact
             )
+
+        elif field in ["Bill Amount", "Cash Received"]:
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                validate="key",
+                validatecommand=vcmd_amount
+            )
+
+        elif field == "Balance":
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="lightgrey",
+                text_color="black",
+                state="disabled"  # 🔒 Prevent manual editing
+            )
+
 
         elif field == "Cash With":
             widget = ctk.CTkComboBox(
@@ -160,6 +195,24 @@ def create_dscm_frame(parent):
         widget.place(x=180, y=y_pos)
         entries[field] = widget
         y_pos += 50
+
+    # ---------- AUTO BALANCE CALCULATION ----------
+    def calculate_balance(event=None):
+        bill = entries["Bill Amount"].get().strip()
+        cash = entries["Cash Received"].get().strip()
+
+        try:
+            bill_value = float(bill) if bill else 0
+            cash_value = float(cash) if cash else 0
+            balance = bill_value - cash_value
+        except ValueError:
+            balance = 0
+
+        entries["Balance"].configure(state="normal")
+        entries["Balance"].delete(0, "end")
+        entries["Balance"].insert(0, f"{balance:.2f}")
+        entries["Balance"].configure(state="disabled")
+
 
     # ---------- VALIDATION FUNCTION ----------
     def validate_entries():
@@ -251,6 +304,10 @@ def create_dscm_frame(parent):
     for field, widget in entries.items():
         if field != "Cash With":
             widget.bind("<KeyRelease>", lambda event: validate_entries())
+
+    # Bind auto calculation
+    entries["Bill Amount"].bind("<KeyRelease>", calculate_balance)
+    entries["Cash Received"].bind("<KeyRelease>", calculate_balance)
 
     ####################
 
