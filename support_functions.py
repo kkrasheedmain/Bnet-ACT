@@ -52,7 +52,6 @@ def create_dscm_frame(parent):
     ###############################################
     # ---------- FTTH VALIDATION ----------
     def validate_ftth(new_value):
-        # Allow empty (so user can delete while typing)
         if new_value == "":
             return True
 
@@ -64,11 +63,15 @@ def create_dscm_frame(parent):
         if len(new_value) > 10:
             return False
 
-        # First digit cannot be 0
-        if new_value.startswith("0"):
+        # First digit must be 4 only
+        if len(new_value) == 1 and new_value != "4":
             return False
 
-        # 🔥 Auto move to Name field when 10 digits entered
+        # Extra safety (if pasted full number)
+        if len(new_value) > 1 and new_value[0] != "4":
+            return False
+
+        # Auto move to Name field after 10 digits
         if len(new_value) == 10:
             dscm_frame.after(10, lambda: entries["Name"].focus())
 
@@ -79,13 +82,20 @@ def create_dscm_frame(parent):
         if new_value == "":
             return True
 
+        # Only digits allowed
         if not new_value.isdigit():
             return False
 
+        # Maximum 10 digits
         if len(new_value) > 10:
             return False
 
-        if new_value.startswith("0"):
+        # First digit must be 6,7,8,9 only
+        if len(new_value) == 1 and new_value not in ["6", "7", "8", "9"]:
+            return False
+
+        # Extra safety (if pasted full number)
+        if len(new_value) > 1 and new_value[0] not in ["6", "7", "8", "9"]:
             return False
 
         # Auto move to Bill Amount after 10 digits
@@ -93,8 +103,6 @@ def create_dscm_frame(parent):
             dscm_frame.after(10, lambda: entries["Bill Amount"].focus())
 
         return True
-
-
 
     vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
