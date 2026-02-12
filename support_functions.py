@@ -239,7 +239,8 @@ def create_dscm_frame(parent):
                     check_btn.configure(state="disabled")
                     return
 
-            elif field != "Cash With" and value == "":
+
+            elif field not in ["Cash With", "Balance"] and value == "":
                 check_btn.configure(state="disabled")
                 return
 
@@ -324,12 +325,35 @@ def create_dscm_frame(parent):
     entries["Bill Amount"].bind("<KeyRelease>", calculate_balance)
     entries["Cash Received"].bind("<KeyRelease>", calculate_balance)
 
-    # ---------- ENTER KEY NAVIGATION ----------
-    entries["Bill Amount"].bind("<Return>",
-        lambda event: entries["Cash Received"].focus())
+    # ---------- FULL ENTER KEY NAVIGATION ----------
 
-    entries["Cash Received"].bind("<Return>",
-        lambda event: entries["Balance"].focus())
+    field_order = [
+        "FTTH No",
+        "Name",
+        "Contact No",
+        "Bill Amount",
+        "Cash Received",
+        "Remarks"
+    ]
+
+    def focus_next(event, current_field):
+        if current_field in field_order:
+            index = field_order.index(current_field)
+            if index + 1 < len(field_order):
+                next_field = field_order[index + 1]
+                entries[next_field].focus()
+            else:
+                check_btn.focus()  # Last field → move to Check button
+
+    # Bind Enter key for each field
+    for field in field_order:
+        entries[field].bind(
+            "<Return>",
+            lambda event, f=field: focus_next(event, f)
+        )
+
+    # Press Enter on Check button to trigger it
+    check_btn.bind("<Return>", lambda event: check_btn.invoke())
 
     ####################
 
