@@ -266,12 +266,21 @@ def create_dscm_frame(parent):
             command=popup.destroy
         ).pack(side="left", padx=10)
 
+        def confirm_button_action():
+            collected_data = {}
+            for field, widget in entries.items():
+                collected_data[field] = widget.get()
+            print("Stored Data:", collected_data)
+            popup.destroy()
+            clear_entries()  # 🔥 RESET FORM
+            entries["FTTH No"].focus()  # 🔥 Put cursor back to first field
+
         ctk.CTkButton(
             btn_frame,
             text="Confirm",
             width=100,
             fg_color="green",
-            command=lambda: [print("Confirmed"), popup.destroy()]
+            command=confirm_button_action
         ).pack(side="left", padx=10)
 
     # ---------- Buttons ----------
@@ -326,11 +335,20 @@ def create_dscm_frame(parent):
     ####################
 
     def clear_entries():
-        for widget in entries.values():
-            if hasattr(widget, "delete"):
+        for field, widget in entries.items():
+            # Enable balance temporarily to clear
+            if field == "Balance":
+                widget.configure(state="normal")
                 widget.delete(0, "end")
+                widget.configure(state="disabled")
 
-        validate_entries()  # 🔄 re-check after clearing
+            # Reset combobox
+            elif field == "Cash With":
+                widget.set("COUNTER")
+            # Normal entries
+            else:
+                widget.delete(0, "end")
+        validate_entries()
 
     cancel_btn = ctk.CTkButton(
         dscm_frame,
