@@ -1,7 +1,5 @@
 import customtkinter as ctk
 from tkcalendar import Calendar
-
-
 from openpyxl import Workbook, load_workbook
 import os
 from datetime import datetime
@@ -11,7 +9,6 @@ from datetime import datetime
 def create_dscm_frame(parent):
     dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
     dscm_frame.place(relwidth=1, relheight=1)
-
     fields = [
         "Date",
         "FTTH No",
@@ -23,69 +20,53 @@ def create_dscm_frame(parent):
         "Cash With",
         "Remarks"
     ]
-
     entries = {}
-    ###############################################
     # ---------- FTTH VALIDATION ----------
     def validate_ftth(new_value):
         if new_value == "":
             return True
-
         # Only digits allowed
         if not new_value.isdigit():
             return False
-
         # Maximum 10 digits
         if len(new_value) > 10:
             return False
-
         # First digit must be 4 only
         if len(new_value) == 1 and new_value != "4":
             return False
-
         # Extra safety (if pasted full number)
         if len(new_value) > 1 and new_value[0] != "4":
             return False
-
         # Auto move to Name field after 10 digits
         if len(new_value) == 10:
             dscm_frame.after(10, lambda: entries["Name"].focus())
-
         return True
 
     # ---------- CONTACT VALIDATION ----------
     def validate_contact(new_value):
         if new_value == "":
             return True
-
         # Only digits allowed
         if not new_value.isdigit():
             return False
-
         # Maximum 10 digits
         if len(new_value) > 10:
             return False
-
         # First digit must be 6,7,8,9 only
         if len(new_value) == 1 and new_value not in ["6", "7", "8", "9"]:
             return False
-
         # Extra safety (if pasted full number)
         if len(new_value) > 1 and new_value[0] not in ["6", "7", "8", "9"]:
             return False
-
         # Auto move to Bill Amount after 10 digits
         if len(new_value) == 10:
             dscm_frame.after(10, lambda: entries["Bill Amount"].focus())
-
         return True
-
 
     # ---------- AMOUNT VALIDATION ----------
     def validate_amount(new_value):
         if new_value == "":
             return True
-
         try:
             float(new_value)
             return True
@@ -96,10 +77,7 @@ def create_dscm_frame(parent):
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
     vcmd_amount = (dscm_frame.register(validate_amount), "%P")
 
-
-    #######################################################
     y_pos = 30
-
     for field in fields:
         lbl = ctk.CTkLabel(
             dscm_frame, text=field,
@@ -107,7 +85,6 @@ def create_dscm_frame(parent):
             text_color="white"
         )
         lbl.place(x=20, y=y_pos)
-
         ############################ Entry Creation Loop
         if field == "Date":
             widget = ctk.CTkEntry(
