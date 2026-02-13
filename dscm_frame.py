@@ -9,6 +9,16 @@ from datetime import datetime
 def create_dscm_frame(parent):
     dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
     dscm_frame.place(relwidth=1, relheight=1)
+
+    # ✅ HEADING LABEL
+    title_label = ctk.CTkLabel(
+        dscm_frame,
+        text="DSCM BILL COLLECTION",
+        font=("Arial", 22, "bold"),
+        text_color="white"
+    )
+    title_label.place(relx=0.5, y=10, anchor="n")
+
     fields = [
         "Date",
         "FTTH No",
@@ -77,7 +87,7 @@ def create_dscm_frame(parent):
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
     vcmd_amount = (dscm_frame.register(validate_amount), "%P")
 
-    y_pos = 30
+    y_pos = 60
     for field in fields:
         lbl = ctk.CTkLabel(
             dscm_frame, text=field,

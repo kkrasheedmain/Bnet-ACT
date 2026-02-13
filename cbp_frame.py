@@ -5,8 +5,18 @@ import os
 from datetime import datetime
 
 def create_cbp_frame(parent):
-    cbp_frame = ctk.CTkFrame(parent, fg_color="grey")
+    cbp_frame = ctk.CTkFrame(parent, fg_color="#3A3A3A")
     cbp_frame.place(relwidth=1, relheight=1)
+
+    # ✅ HEADING LABEL
+    title_label = ctk.CTkLabel(
+        cbp_frame,
+        text="CBP BILL COLLECTION",
+        font=("Arial", 22, "bold"),
+        text_color="white"
+    )
+    title_label.place(relx=0.5, y=10, anchor="n")
+
     fields = [
         "Date",
         "FTTH No",
@@ -76,7 +86,7 @@ def create_cbp_frame(parent):
     vcmd_contact = (cbp_frame.register(validate_contact), "%P")
     vcmd_amount = (cbp_frame.register(validate_amount), "%P")
 
-    y_pos = 30
+    y_pos = 60
     for field in fields:
         lbl = ctk.CTkLabel(
             cbp_frame, text=field,
