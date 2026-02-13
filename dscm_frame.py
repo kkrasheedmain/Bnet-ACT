@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from tkcalendar import Calendar
+
 
 from openpyxl import Workbook, load_workbook
 import os
@@ -113,11 +115,11 @@ def create_dscm_frame(parent):
                 width=200,
                 fg_color="lightgrey",
                 text_color="black",
-                state="normal"
+                state="readonly"
             )
             # Auto-fill today's date
             widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
-            widget.configure(state="disabled")  # 🔒 lock editing
+
 
         elif field == "FTTH No":
             widget = ctk.CTkEntry(
@@ -231,6 +233,36 @@ def create_dscm_frame(parent):
 
         check_btn.configure(state="normal")
 
+    # ---------- DATE PICKER ----------
+    def open_calendar(event=None):
+        cal_win = ctk.CTkToplevel(parent)
+        cal_win.title("Select Date")
+        cal_win.geometry("300x320")
+        cal_win.grab_set()
+
+        cal = Calendar(
+            cal_win,
+            selectmode="day",
+            date_pattern="yyyy-mm-dd"
+        )
+        cal.pack(pady=20)
+
+        def select_date():
+            selected = cal.get_date()
+            entries["Date"].configure(state="normal")
+            entries["Date"].delete(0, "end")
+            entries["Date"].insert(0, selected)
+            entries["Date"].configure(state="readonly")
+            cal_win.destroy()
+
+        ctk.CTkButton(
+            cal_win,
+            text="OK",
+            command=select_date
+        ).pack(pady=10)
+
+
+
     ### Create Excel Save Function
     def save_to_excel(data_dict):
         folder_path = "D:/BETA-SOFT"
@@ -328,6 +360,7 @@ def create_dscm_frame(parent):
             command=confirm_button_action
         ).pack(side="left", padx=10)
 
+
     # ---------- Buttons ----------
     check_btn = ctk.CTkButton(
         dscm_frame,
@@ -342,10 +375,12 @@ def create_dscm_frame(parent):
     for field, widget in entries.items():
         if field != "Cash With":
             widget.bind("<KeyRelease>", lambda event: validate_entries())
+    entries["Date"].bind("<Button-1>", open_calendar)
 
     # Bind auto calculation
     entries["Bill Amount"].bind("<KeyRelease>", calculate_balance)
     entries["Cash Received"].bind("<KeyRelease>", calculate_balance)
+
 
     # ---------- FULL ENTER KEY NAVIGATION ----------
 
