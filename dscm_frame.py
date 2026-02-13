@@ -104,7 +104,7 @@ def create_dscm_frame(parent):
                 text_color="black",
             )
             # Auto-fill today's date
-            widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
+            widget.insert(0, datetime.now().strftime("%d-%m-%Y"))
             widget.configure(state="readonly")
 
 
@@ -230,7 +230,7 @@ def create_dscm_frame(parent):
         cal = Calendar(
             cal_win,
             selectmode="day",
-            date_pattern="yyyy-mm-dd"
+            date_pattern="dd-mm-yyyy"
         )
         cal.pack(pady=20)
 
