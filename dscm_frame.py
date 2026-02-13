@@ -115,10 +115,10 @@ def create_dscm_frame(parent):
                 width=200,
                 fg_color="lightgrey",
                 text_color="black",
-                state="readonly"
             )
             # Auto-fill today's date
             widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
+            widget.configure(state="readonly")
 
 
         elif field == "FTTH No":
@@ -421,7 +421,7 @@ def create_dscm_frame(parent):
                 widget.configure(state="normal")
                 widget.delete(0, "end")
                 widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
-                widget.configure(state="disabled")
+                widget.configure(state="readonly")
 
             # Enable balance temporarily to clear
             elif field == "Balance":
