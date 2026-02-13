@@ -332,7 +332,10 @@ def create_dscm_frame(parent):
         def confirm_button_action():
             collected_data = {}
             for field, widget in entries.items():
-                collected_data[field] = widget.get()
+                value = widget.get()
+                if field == "Date":
+                    value = f"'{value}"
+                collected_data[field] = value
             print("Stored Data:", collected_data)
             save_to_excel(collected_data)
             popup.destroy()
