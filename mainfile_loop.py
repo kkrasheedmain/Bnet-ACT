@@ -1,23 +1,42 @@
 import customtkinter as ctk
 from dscm_frame import create_dscm_frame
+from cbp_frame import create_cbp_frame
+
+frames = {}
+
+def show_frame(name, parent):
+    # destroy existing frame if exists
+    for frame in frames.values():
+        frame.destroy()
+    frames.clear()
+
+    # create selected frame
+    if name == "DSCM":
+        frames["DSCM"] = create_dscm_frame(parent)
+    elif name == "CBP":
+        frames["CBP"] = create_cbp_frame(parent)
+
+    # show frame
+    frames[name].pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
 
-def create_side_frame(parent):
+
+def create_side_frame(parent, main_parent):
     side_frame = ctk.CTkFrame(parent, width=200, border_width=1,
                               border_color='red', fg_color='coral1')
 
     side_frame_colour = side_frame.cget('fg_color')
 
     buttons = [
-        ("DSCM BILL", 30),
-        ("CBP BILL", 130),
-        ("CTOP-UP BILL", 230),
-        ("OTHER-COLLECTION", 330),
-        ("EXPENSE", 430),
-        ("STOCK PURCHASE", 530),
+        ("DSCM BILL", 30, "DSCM"),
+        ("CBP BILL", 130, "CBP"),
+        ("CTOP-UP BILL", 230, "CTOP"),
+        ("OTHER-COLLECTION", 330, "OTHER"),
+        ("EXPENSE", 430, "EXPENSE"),
+        ("STOCK PURCHASE", 530, "STOCK"),
     ]
 
-    for text, y in buttons:
+    for text, y, key in buttons:
         btn = ctk.CTkButton(
             side_frame,
             text=text,
@@ -25,7 +44,8 @@ def create_side_frame(parent):
             font=('Bold', 15),
             width=60,
             hover=False,
-            fg_color=side_frame_colour
+            fg_color=side_frame_colour,
+            command=lambda k=key: show_frame(k, main_parent)
         )
         btn.place(x=5 if y >= 330 else 10, y=y)
 
@@ -33,11 +53,7 @@ def create_side_frame(parent):
 
 
 
-
-
-
 if __name__ == '__main__':
-
     window = ctk.CTk()
     window.configure(fg_color="#1e90ff")
     window.title("One-Solution")
@@ -45,14 +61,11 @@ if __name__ == '__main__':
     window.iconbitmap("icon-Bharat BNET.ico")
     window.resizable(False, False)
 
-    # import sidebar
-    side_frame = create_side_frame(window)
+    # side frame
+    side_frame = create_side_frame(window, window)
     side_frame.pack(side='left', fill='y', padx=5, pady=5)
 
-    #main_frame
-    dscm_frame= create_dscm_frame(window)
-    dscm_frame.pack(side='left', fill='both', expand=True, pady=5, padx=5)
-
-
+    # show default frame
+    show_frame("DSCM", window)
 
     window.mainloop()
