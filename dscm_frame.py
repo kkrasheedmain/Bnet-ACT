@@ -272,7 +272,7 @@ def create_dscm_frame(parent):
             sheet.append(headers)
 
         now = datetime.now()
-        date_str = now.strftime("%Y-%m-%d")
+        date_str = "'"+now.strftime("%d-%m-%Y")
         time_str = now.strftime("%H:%M:%S")
         row_data = [date_str, time_str] + list(data_dict.values())
         sheet.append(row_data)
