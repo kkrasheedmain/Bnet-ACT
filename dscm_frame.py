@@ -11,6 +11,7 @@ def create_dscm_frame(parent):
     dscm_frame.place(relwidth=1, relheight=1)
 
     fields = [
+        "Date",
         "FTTH No",
         "Name",
         "Contact No",
@@ -106,7 +107,19 @@ def create_dscm_frame(parent):
         lbl.place(x=20, y=y_pos)
 
         ############################ Entry Creation Loop
-        if field == "FTTH No":
+        if field == "Date":
+            widget = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="lightgrey",
+                text_color="black",
+                state="normal"
+            )
+            # Auto-fill today's date
+            widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
+            widget.configure(state="disabled")  # 🔒 lock editing
+
+        elif field == "FTTH No":
             widget = ctk.CTkEntry(
                 dscm_frame,
                 width=200,
@@ -212,8 +225,7 @@ def create_dscm_frame(parent):
                     check_btn.configure(state="disabled")
                     return
 
-
-            elif field not in ["Cash With", "Balance"] and value == "":
+            elif field not in ["Cash With", "Balance", "Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
 
@@ -369,18 +381,25 @@ def create_dscm_frame(parent):
 
     def clear_entries():
         for field, widget in entries.items():
+            # ✅ Reset Date to today
+            if field == "Date":
+                widget.configure(state="normal")
+                widget.delete(0, "end")
+                widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
+                widget.configure(state="disabled")
+
             # Enable balance temporarily to clear
-            if field == "Balance":
+            elif field == "Balance":
                 widget.configure(state="normal")
                 widget.delete(0, "end")
                 widget.configure(state="disabled")
-
             # Reset combobox
             elif field == "Cash With":
                 widget.set("COUNTER")
             # Normal entries
             else:
                 widget.delete(0, "end")
+
         validate_entries()
 
     cancel_btn = ctk.CTkButton(
