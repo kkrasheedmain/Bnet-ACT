@@ -3,7 +3,7 @@ from dscm_frame import create_dscm_frame
 
 
 def create_side_frame(parent):
-    side_frame = ctk.CTkFrame(parent, width=150, border_width=1,
+    side_frame = ctk.CTkFrame(parent, width=200, border_width=1,
                               border_color='red', fg_color='coral1')
 
     side_frame_colour = side_frame.cget('fg_color')
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     window = ctk.CTk()
     window.configure(fg_color="#1e90ff")
     window.title("One-Solution")
-    window.geometry("800x600")
+    window.geometry("800x800")
     window.iconbitmap("icon-Bharat BNET.ico")
     window.resizable(False, False)
 
