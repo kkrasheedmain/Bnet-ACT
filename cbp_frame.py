@@ -278,7 +278,7 @@ def create_cbp_frame(parent):
     # ---------- CHECK BUTTON ACTION ----------
     def show_verification():
         popup = ctk.CTkToplevel(parent)
-        popup.title("Verification")
+        popup.title("CBP COLLECTION VERIFICATION")
         popup.geometry("450x500")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
@@ -292,7 +292,7 @@ def create_cbp_frame(parent):
 
         title = ctk.CTkLabel(
             popup_frame,
-            text="Verification Details",
+            text="CBP COLLECTION VERIFICATION DETAILS",
             font=("Arial", 18, "bold")
         )
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
