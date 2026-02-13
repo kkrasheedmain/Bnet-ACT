@@ -260,10 +260,10 @@ def create_cbp_frame(parent):
         else:
             workbook = Workbook()
         # If sheet "dscm" exists → use it
-        if "dscm" in workbook.sheetnames:
-            sheet = workbook["dscm"]
+        if "cbp" in workbook.sheetnames:
+            sheet = workbook["cbp"]
         else:
-            sheet = workbook.create_sheet("dscm")
+            sheet = workbook.create_sheet("cbp")
             # Write header only first time
             headers = ["Date", "Time"] + list(data_dict.keys())
             sheet.append(headers)
