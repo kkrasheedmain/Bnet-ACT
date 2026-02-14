@@ -181,7 +181,7 @@ def create_other_frame(parent):
             widget = ctk.CTkComboBox(
                 other_frame,
                 width=200,
-                values=["ADAPTOR","MODEM","ONT","CABLING","RECONNECTION","SHIFTING","MAINTENANCE","PENALTY","OTHERS"],
+                values=["ADAPTOR","WIFI-ROUTER","FTTH-ONT","CABLING","RECONNECTION","SHIFTING","MAINTENANCE","PENALTY","OTHERS"],
                 fg_color="white",
                 text_color="black",
                 command = toggle_other_detail
@@ -363,11 +363,29 @@ def create_other_frame(parent):
 
         def confirm_button_action():
             collected_data = {}
-            for field, widget in entries.items():
-                value = widget.get()
-                if field == "Date":
-                    value = f"'{value}"
-                collected_data[field] = value
+
+            # Desired order
+            ordered_fields = [
+                "Date",
+                "FTTH No",
+                "Name",
+                "Contact No",
+                "Bill Amount",
+                "Cash Received",
+                "Balance",
+                "Cash With",
+                "Collection Type",
+                "Collection Other Detail",
+                "Remarks"
+            ]
+
+            for field in ordered_fields:
+                if field in entries:
+                    value = entries[field].get()
+                    if field == "Date":
+                        value = f"'{value}"
+                    collected_data[field] = value
+
             print("Stored Data:", collected_data)
             save_to_excel(collected_data)
             popup.destroy()
