@@ -333,22 +333,26 @@ def create_other_frame(parent):
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
 
         row = 1
-        for field, widget in entries.items():
-            value = widget.get()
+        popup_order = ["Date","FTTH No","Name","Contact No","Bill Amount","Cash Received","Balance","Cash With",
+            "Collection Type","Collection Other Detail","Remarks" ]
 
-            ctk.CTkLabel(
-                popup_frame,
-                text=field,
-                anchor="w"
-            ).grid(row=row, column=0, padx=10, pady=6, sticky="w")
+        for field in popup_order:
+            if field in entries:
+                value = entries[field].get()
 
-            ctk.CTkLabel(
-                popup_frame,
-                text=value,
-                anchor="w"
-            ).grid(row=row, column=1, padx=10, pady=6, sticky="w")
+                ctk.CTkLabel(
+                    popup_frame,
+                    text=field,
+                    anchor="w"
+                ).grid(row=row, column=0, padx=10, pady=6, sticky="w")
 
-            row += 1
+                ctk.CTkLabel(
+                    popup_frame,
+                    text=value,
+                    anchor="w"
+                ).grid(row=row, column=1, padx=10, pady=6, sticky="w")
+
+                row += 1
 
         # Buttons
         btn_frame = ctk.CTkFrame(popup_frame)
