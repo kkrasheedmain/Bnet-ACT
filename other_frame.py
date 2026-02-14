@@ -28,6 +28,7 @@ def create_other_frame(parent):
         "Cash Received",
         "Balance",
         "Cash With",
+        "Collection Type",
         "Remarks"
     ]
     entries = {}
@@ -168,6 +169,23 @@ def create_other_frame(parent):
             )
             widget.set("COUNTER")
 
+        elif field == "Collection Type":
+            widget = ctk.CTkComboBox(
+                other_frame,
+                width=200,
+                values=[
+                    "INSTALLATION",
+                    "RECONNECTION",
+                    "SHIFTING",
+                    "MAINTENANCE",
+                    "PENALTY",
+                    "OTHERS"
+                ],
+                fg_color="white",
+                text_color="black"
+            )
+            widget.set("INSTALLATION")  # default value
+
         else:
             widget = ctk.CTkEntry(
                 other_frame,
@@ -214,7 +232,7 @@ def create_other_frame(parent):
                     check_btn.configure(state="disabled")
                     return
 
-            elif field not in ["Cash With", "Balance", "Date"] and value == "":
+            elif field not in ["Cash With", "Collection Type", "Balance", "Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
 
@@ -421,6 +439,9 @@ def create_other_frame(parent):
             # Reset combobox
             elif field == "Cash With":
                 widget.set("COUNTER")
+            elif field == "Collection Type":
+                widget.set("INSTALLATION")
+
             # Normal entries
             else:
                 widget.delete(0, "end")
