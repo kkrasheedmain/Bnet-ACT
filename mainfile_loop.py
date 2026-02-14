@@ -1,6 +1,9 @@
 import customtkinter as ctk
+
+
 from dscm_frame import create_dscm_frame
 from cbp_frame import create_cbp_frame
+from ctop_frame import create_ctop_frame
 
 frames = {}
 
@@ -15,6 +18,8 @@ def show_frame(name, parent):
         frames["DSCM"] = create_dscm_frame(parent)
     elif name == "CBP":
         frames["CBP"] = create_cbp_frame(parent)
+    elif name == "CTOP":
+        frames["CTOP"] = create_ctop_frame(parent)
 
     # show frame
     frames[name].pack(side='left', fill='both', expand=True, padx=5, pady=5)
