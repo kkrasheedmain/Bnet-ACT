@@ -300,7 +300,7 @@ def create_other_frame(parent):
     def show_verification():
         popup = ctk.CTkToplevel(parent)
         popup.title("OTHER COLLECTION VERIFICATION ")
-        popup.geometry("450x500")
+        popup.geometry("450x620")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
         popup.resizable(False, False)
