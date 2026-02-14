@@ -33,6 +33,16 @@ def create_other_frame(parent):
     ]
     entries = {}
 
+    def toggle_staff_combo(choice):
+        if choice == "STAFF":
+            entries["Staff Name"].place(
+                x=400,
+                y=entries["Cash With"].winfo_y()
+            )
+        else:
+            entries["Staff Name"].set("")
+            entries["Staff Name"].place_forget()
+
     def toggle_other_detail(choice):
         if choice == "OTHERS":
             entries["Collection Other Detail"].place(x=400,y=entries["Collection Type"].winfo_y())
@@ -173,9 +183,24 @@ def create_other_frame(parent):
                 width=200,
                 values=["COUNTER", "OFFICE-COLLECTION-ACCOUNT", "STAFF", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
                 fg_color="white",
-                text_color="black"
+                text_color="black",
+                command=lambda choice: toggle_staff_combo(choice)
             )
             widget.set("COUNTER")
+
+            # 🔹 Hidden Staff ComboBox
+            staff_combo = ctk.CTkComboBox(
+                other_frame,
+                width=200,
+                values=["Safeer", "Sajin", "Midhun", "Babu", "Sidarth", "Minha"],
+                fg_color="white",
+                text_color="black"
+            )
+            staff_combo.place(x=400, y=y_pos)
+            staff_combo.place_forget()
+
+            entries["Staff Name"] = staff_combo
+
 
         elif field == "Collection Type":
             widget = ctk.CTkComboBox(
@@ -333,8 +358,8 @@ def create_other_frame(parent):
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
 
         row = 1
-        popup_order = ["Date","FTTH No","Name","Contact No","Bill Amount","Cash Received","Balance","Cash With",
-            "Collection Type","Collection Other Detail","Remarks" ]
+        popup_order = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount", "Cash Received",
+            "Balance", "Cash With", "Staff Name","Collection Type", "Collection Other Detail", "Remarks"]
 
         for field in popup_order:
             if field in entries:
@@ -369,19 +394,8 @@ def create_other_frame(parent):
             collected_data = {}
 
             # Desired order
-            ordered_fields = [
-                "Date",
-                "FTTH No",
-                "Name",
-                "Contact No",
-                "Bill Amount",
-                "Cash Received",
-                "Balance",
-                "Cash With",
-                "Collection Type",
-                "Collection Other Detail",
-                "Remarks"
-            ]
+            ordered_fields = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount", "Cash Received",
+                "Balance", "Cash With", "Staff Name","Collection Type", "Collection Other Detail", "Remarks"]
 
             for field in ordered_fields:
                 if field in entries:
@@ -481,6 +495,11 @@ def create_other_frame(parent):
             elif field == "Collection Other Detail":
                 widget.delete(0, "end")
                 widget.place_forget()
+
+            elif field == "Staff Name":
+                widget.set("")
+                widget.place_forget()
+
             # Normal entries
             else:
                 widget.delete(0, "end")
