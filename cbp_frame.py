@@ -405,7 +405,7 @@ def create_cbp_frame(parent):
             if field == "Date":
                 widget.configure(state="normal")
                 widget.delete(0, "end")
-                widget.insert(0, datetime.now().strftime("%Y-%m-%d"))
+                widget.insert(0, datetime.now().strftime("%d-%m-%Y"))
                 widget.configure(state="readonly")
 
             # Enable balance temporarily to clear

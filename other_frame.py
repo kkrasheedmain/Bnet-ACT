@@ -6,16 +6,16 @@ from datetime import datetime
 
 
 ###########################
-def create_dscm_frame(parent):
-    dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
-    dscm_frame.place(relwidth=1, relheight=1)
+def create_other_frame(parent):
+    other_frame = ctk.CTkFrame(parent, fg_color='#FDEBD0')
+    other_frame.place(relwidth=1, relheight=1)
 
     # ✅ HEADING LABEL
     title_label = ctk.CTkLabel(
-        dscm_frame,
-        text="DSCM BILL COLLECTION",
+        other_frame,
+        text="OTHER COLLECTION",
         font=("Arial", 22, "bold"),
-        text_color="white"
+        text_color="black"
     )
     title_label.place(relx=0.5, y=10, anchor="n")
 
@@ -49,7 +49,7 @@ def create_dscm_frame(parent):
             return False
         # Auto move to Name field after 10 digits
         if len(new_value) == 10:
-            dscm_frame.after(10, lambda: entries["Name"].focus())
+            other_frame.after(10, lambda: entries["Name"].focus())
         return True
 
     # ---------- CONTACT VALIDATION ----------
@@ -70,7 +70,7 @@ def create_dscm_frame(parent):
             return False
         # Auto move to Bill Amount after 10 digits
         if len(new_value) == 10:
-            dscm_frame.after(10, lambda: entries["Bill Amount"].focus())
+            other_frame.after(10, lambda: entries["Bill Amount"].focus())
         return True
 
     # ---------- AMOUNT VALIDATION ----------
@@ -83,22 +83,22 @@ def create_dscm_frame(parent):
         except ValueError:
             return False
 
-    vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
-    vcmd_contact = (dscm_frame.register(validate_contact), "%P")
-    vcmd_amount = (dscm_frame.register(validate_amount), "%P")
+    vcmd_ftth = (other_frame.register(validate_ftth), "%P")
+    vcmd_contact = (other_frame.register(validate_contact), "%P")
+    vcmd_amount = (other_frame.register(validate_amount), "%P")
 
     y_pos = 60
     for field in fields:
         lbl = ctk.CTkLabel(
-            dscm_frame, text=field,
+            other_frame, text=field,
             font=("Arial", 15),
-            text_color="white"
+            text_color="black"
         )
         lbl.place(x=20, y=y_pos)
         ############################ Entry Creation Loop
         if field == "Date":
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="lightgrey",
                 text_color="black",
@@ -110,7 +110,7 @@ def create_dscm_frame(parent):
 
         elif field == "FTTH No":
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="white",
                 text_color="black",
@@ -120,7 +120,7 @@ def create_dscm_frame(parent):
 
         elif field == "Contact No":
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="white",
                 text_color="black",
@@ -130,7 +130,7 @@ def create_dscm_frame(parent):
 
         elif field == "Bill Amount":
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="white",
                 text_color="black",
@@ -140,7 +140,7 @@ def create_dscm_frame(parent):
 
         elif field == "Cash Received":
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="white",
                 text_color="black",
@@ -150,7 +150,7 @@ def create_dscm_frame(parent):
 
         elif field == "Balance":
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="lightgrey",
                 text_color="black",
@@ -160,7 +160,7 @@ def create_dscm_frame(parent):
 
         elif field == "Cash With":
             widget = ctk.CTkComboBox(
-                dscm_frame,
+                other_frame,
                 width=200,
                 values=["COUNTER", "IOB-ACCOUNT", "TEKNIX", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
                 fg_color="white",
@@ -170,7 +170,7 @@ def create_dscm_frame(parent):
 
         else:
             widget = ctk.CTkEntry(
-                dscm_frame,
+                other_frame,
                 width=200,
                 fg_color="white",
                 text_color="black"
@@ -262,11 +262,11 @@ def create_dscm_frame(parent):
             workbook = load_workbook(full_path)
         else:
             workbook = Workbook()
-        # If sheet "dscm" exists → use it
-        if "dscm" in workbook.sheetnames:
-            sheet = workbook["dscm"]
+        # If sheet "other" exists → use it
+        if "other" in workbook.sheetnames:
+            sheet = workbook["other"]
         else:
-            sheet = workbook.create_sheet("dscm")
+            sheet = workbook.create_sheet("other")
             # Write header only first time
             headers = ["Date", "Time"] + list(data_dict.keys())
             sheet.append(headers)
@@ -281,7 +281,7 @@ def create_dscm_frame(parent):
     # ---------- CHECK BUTTON ACTION ----------
     def show_verification():
         popup = ctk.CTkToplevel(parent)
-        popup.title("DSCM VERIFICATION ")
+        popup.title("OTHER COLLECTION VERIFICATION ")
         popup.geometry("450x500")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
@@ -295,7 +295,7 @@ def create_dscm_frame(parent):
 
         title = ctk.CTkLabel(
             popup_frame,
-            text="DSCM COLLECTION VERIFICATION DETAILS",
+            text="OTHER COLLECTION VERIFICATION DETAILS",
             font=("Arial", 18, "bold")
         )
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
@@ -353,7 +353,7 @@ def create_dscm_frame(parent):
 
     # ---------- Buttons ----------
     check_btn = ctk.CTkButton(
-        dscm_frame,
+        other_frame,
         text="Check",
         width=100,
         fg_color="green",
@@ -428,7 +428,7 @@ def create_dscm_frame(parent):
         validate_entries()
 
     cancel_btn = ctk.CTkButton(
-        dscm_frame,
+        other_frame,
         text="Cancel",
         width=100,
         fg_color="red",
@@ -439,5 +439,5 @@ def create_dscm_frame(parent):
 
     ####################
 
-    return dscm_frame
+    return other_frame
 
