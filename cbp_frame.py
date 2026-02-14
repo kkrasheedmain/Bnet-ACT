@@ -161,7 +161,7 @@ def create_cbp_frame(parent):
             widget = ctk.CTkComboBox(
                 cbp_frame,
                 width=200,
-                values=["COUNTER", "IOB-ACCOUNT", "TEKNIX", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
+                values=["COUNTER", "OFFICE-COLLECTION-ACCOUNT", "STAFF", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
                 fg_color="white",
                 text_color="black"
             )
