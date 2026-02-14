@@ -19,7 +19,7 @@ def create_ctop_frame(parent):
 
     fields = [
         "Date",
-        "FTTH No",
+        "Mobile No",
         "Name",
         "Contact No",
         "Bill Amount",
@@ -30,8 +30,8 @@ def create_ctop_frame(parent):
     ]
     entries = {}
 
-    # ---------- FTTH VALIDATION ----------
-    def validate_ftth(new_value):
+    # # ---------- Mobile VALIDATION ----------
+    def validate_mobile(new_value):
         if new_value == "":
             return True
         # Only digits allowed
@@ -40,16 +40,17 @@ def create_ctop_frame(parent):
         # Maximum 10 digits
         if len(new_value) > 10:
             return False
-        # First digit must be 4 only
-        if len(new_value) == 1 and new_value != "4":
+        # First digit must be 6,7,8,9 only
+        if len(new_value) == 1 and new_value not in ["6", "7", "8", "9"]:
             return False
         # Extra safety (if pasted full number)
-        if len(new_value) > 1 and new_value[0] != "4":
+        if len(new_value) > 1 and new_value[0] not in ["6", "7", "8", "9"]:
             return False
-        # Auto move to Name field after 10 digits
+        # Auto move to Bill Amount after 10 digits
         if len(new_value) == 10:
             ctop_frame.after(10, lambda: entries["Name"].focus())
         return True
+
 
     # ---------- CONTACT VALIDATION ----------
     def validate_contact(new_value):
@@ -82,7 +83,7 @@ def create_ctop_frame(parent):
         except ValueError:
             return False
 
-    vcmd_ftth = (ctop_frame.register(validate_ftth), "%P")
+    vcmd_Mobile = (ctop_frame.register(validate_mobile), "%P")
     vcmd_contact = (ctop_frame.register(validate_contact), "%P")
     vcmd_amount = (ctop_frame.register(validate_amount), "%P")
 
@@ -107,14 +108,14 @@ def create_ctop_frame(parent):
             widget.configure(state="readonly")
 
 
-        elif field == "FTTH No":
+        elif field == "Mobile No":
             widget = ctk.CTkEntry(
                 ctop_frame,
                 width=200,
                 fg_color="white",
                 text_color="black",
                 validate="key",
-                validatecommand=vcmd_ftth
+                validatecommand=vcmd_Mobile
             )
 
         elif field == "Contact No":
@@ -208,7 +209,7 @@ def create_ctop_frame(parent):
         for field, widget in entries.items():
             value = widget.get().strip()
 
-            if field in ["FTTH No", "Contact No"]:
+            if field in ["Mobile No", "Contact No"]:
                 if len(value) != 10:
                     check_btn.configure(state="disabled")
                     return
@@ -337,7 +338,7 @@ def create_ctop_frame(parent):
             save_to_excel(collected_data)
             popup.destroy()
             clear_entries()
-            entries["FTTH No"].focus()
+            entries["Mobile No"].focus()
 
         ctk.CTkButton(
             btn_frame,
@@ -370,7 +371,7 @@ def create_ctop_frame(parent):
     # ---------- FULL ENTER KEY NAVIGATION ----------
 
     field_order = [
-        "FTTH No",
+        "Mobile No",
         "Name",
         "Contact No",
         "Bill Amount",
@@ -379,6 +380,7 @@ def create_ctop_frame(parent):
     ]
 
     def focus_next(event, current_field):
+        print("Current field:", current_field)
         if current_field in field_order:
             index = field_order.index(current_field)
             if index + 1 < len(field_order):
