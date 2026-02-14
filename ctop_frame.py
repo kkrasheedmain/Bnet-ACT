@@ -5,13 +5,13 @@ import os
 from datetime import datetime
 
 def create_ctop_frame(parent):
-    ctop_frame = ctk.CTkFrame(parent, fg_color="#3A3A3A")
+    ctop_frame = ctk.CTkFrame(parent, fg_color="#1E3A8A")
     ctop_frame.place(relwidth=1, relheight=1)
 
     # ✅ HEADING LABEL
     title_label = ctk.CTkLabel(
         ctop_frame,
-        text="CBP BILL COLLECTION",
+        text="MOBILE RECHARGE TOP-UP",
         font=("Arial", 22, "bold"),
         text_color="white"
     )
@@ -260,10 +260,10 @@ def create_ctop_frame(parent):
         else:
             workbook = Workbook()
         # If sheet "dscm" exists → use it
-        if "cbp" in workbook.sheetnames:
-            sheet = workbook["cbp"]
+        if "ctop" in workbook.sheetnames:
+            sheet = workbook["ctop"]
         else:
-            sheet = workbook.create_sheet("cbp")
+            sheet = workbook.create_sheet("ctop")
             # Write header only first time
             headers = ["Date", "Time"] + list(data_dict.keys())
             sheet.append(headers)
@@ -278,7 +278,7 @@ def create_ctop_frame(parent):
     # ---------- CHECK BUTTON ACTION ----------
     def show_verification():
         popup = ctk.CTkToplevel(parent)
-        popup.title("CBP COLLECTION VERIFICATION")
+        popup.title("MOBILE RECHARGE TOP-UP ")
         popup.geometry("450x500")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
@@ -292,7 +292,7 @@ def create_ctop_frame(parent):
 
         title = ctk.CTkLabel(
             popup_frame,
-            text="CBP COLLECTION VERIFICATION DETAILS",
+            text="MOBILE RECHARGE TOPUP ",
             font=("Arial", 18, "bold")
         )
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))

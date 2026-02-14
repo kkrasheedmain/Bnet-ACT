@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 
 def create_cbp_frame(parent):
-    cbp_frame = ctk.CTkFrame(parent, fg_color="#3A3A3A")
+    cbp_frame = ctk.CTkFrame(parent, fg_color="#98FB98")
     cbp_frame.place(relwidth=1, relheight=1)
 
     # ✅ HEADING LABEL
@@ -13,7 +13,7 @@ def create_cbp_frame(parent):
         cbp_frame,
         text="CBP BILL COLLECTION",
         font=("Arial", 22, "bold"),
-        text_color="white"
+        text_color="black"
     )
     title_label.place(relx=0.5, y=10, anchor="n")
 
@@ -91,7 +91,7 @@ def create_cbp_frame(parent):
         lbl = ctk.CTkLabel(
             cbp_frame, text=field,
             font=("Arial", 15),
-            text_color="white"
+            text_color="black"
         )
         lbl.place(x=20, y=y_pos)
         ############################ Entry Creation Loop
