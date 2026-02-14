@@ -32,6 +32,14 @@ def create_other_frame(parent):
         "Remarks"
     ]
     entries = {}
+
+    def toggle_other_detail(choice):
+        if choice == "OTHERS":
+            entries["Collection Other Detail"].place(x=400,y=entries["Collection Type"].winfo_y())
+        else:
+            entries["Collection Other Detail"].delete(0, "end")
+            entries["Collection Other Detail"].place_forget()
+
     # ---------- FTTH VALIDATION ----------
     def validate_ftth(new_value):
         if new_value == "":
@@ -175,10 +183,23 @@ def create_other_frame(parent):
                 width=200,
                 values=["ADAPTOR","MODEM","ONT","CABLING","RECONNECTION","SHIFTING","MAINTENANCE","PENALTY","OTHERS"],
                 fg_color="white",
-                text_color="black"
-            )
+                text_color="black",
+                command = toggle_other_detail
+                )
             widget.set("ADAPTOR")  # default value
 
+            # 🔹 Hidden entry for "OTHERS" details
+            other_detail_entry = ctk.CTkEntry(
+                other_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                placeholder_text="Enter details"
+            )
+            other_detail_entry.place(x=400, y=y_pos)  # right side
+            other_detail_entry.place_forget()  # hide initially
+
+            entries["Collection Other Detail"] = other_detail_entry
 
         else:
             widget = ctk.CTkEntry(
@@ -226,10 +247,9 @@ def create_other_frame(parent):
                     check_btn.configure(state="disabled")
                     return
 
-            elif field not in ["Cash With", "Collection Type", "Balance", "Date"] and value == "":
+            elif field not in ["Cash With", "Collection Type", "Collection Other Detail", "Balance","Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
-
         check_btn.configure(state="normal")
 
     # ---------- DATE PICKER ----------
@@ -434,8 +454,11 @@ def create_other_frame(parent):
             elif field == "Cash With":
                 widget.set("COUNTER")
             elif field == "Collection Type":
-                widget.set("INSTALLATION")
+                widget.set("ADAPTOR")
 
+            elif field == "Collection Other Detail":
+                widget.delete(0, "end")
+                widget.place_forget()
             # Normal entries
             else:
                 widget.delete(0, "end")
