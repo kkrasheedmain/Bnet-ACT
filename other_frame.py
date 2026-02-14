@@ -173,18 +173,12 @@ def create_other_frame(parent):
             widget = ctk.CTkComboBox(
                 other_frame,
                 width=200,
-                values=[
-                    "INSTALLATION",
-                    "RECONNECTION",
-                    "SHIFTING",
-                    "MAINTENANCE",
-                    "PENALTY",
-                    "OTHERS"
-                ],
+                values=["ADAPTOR","MODEM","ONT","CABLING","RECONNECTION","SHIFTING","MAINTENANCE","PENALTY","OTHERS"],
                 fg_color="white",
                 text_color="black"
             )
-            widget.set("INSTALLATION")  # default value
+            widget.set("ADAPTOR")  # default value
+
 
         else:
             widget = ctk.CTkEntry(
