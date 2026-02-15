@@ -35,16 +35,12 @@ def create_other_frame(parent):
 
     def toggle_staff_combo(choice):
         if choice == "STAFF":
-            entries["Staff Name"].set("SAJIN")  # ensure default
-            entries["Staff Name"].place(
-                x=400,
-                y=entries["Cash With"].winfo_y()
-            )
+            entries["Staff Name"].set("SAJIN")
+            entries["Staff Name"].place(x=400,y=entries["Cash With"].winfo_y())
         else:
-            entries["Staff Name"].set("SAJIN")  # reset silently
             entries["Staff Name"].place_forget()
 
-    def toggle_coll_type_other_detail(choice): # FOR COLLECTION TYPE -OTHERS
+    def toggle_coll_type_other_detail(choice): # FOR TYPE OF COLLECTION  -OTHERS
         if choice == "OTHERS":
             entries["Collection Other Detail"].place(x=400,y=entries["Collection Type"].winfo_y())
         else:
@@ -53,10 +49,13 @@ def create_other_frame(parent):
 
     def toggle_cash_with_other_detail(choice): # FOR COLLECTION WITH = OTHERS
         if choice == "OTHERS":
-            entries["Cash Other Detail"].place(x=400,y=entries["Cash With"].winfo_y()            )
+            entries["Cash Other Detail"].delete(0, "end")  # ensure fresh input
+            entries["Cash Other Detail"].place(x=400,y=entries["Cash With"].winfo_y())
         else:
             entries["Cash Other Detail"].delete(0, "end")
             entries["Cash Other Detail"].place_forget()
+
+
 
     # ---------- FTTH VALIDATION ----------
     def validate_ftth(new_value):
@@ -208,11 +207,11 @@ def create_other_frame(parent):
             staff_combo = ctk.CTkComboBox(
                 other_frame,
                 width=200,
-                values=["Safeer", "Sajin", "Midhun", "Babu", "Sidarth", "Minha"],
+                values=["SAFEER", "SAJIN", "MIDHUN", "BABU", "SIDARTH", "MINHA"],
                 fg_color="white",
                 text_color="black"
             )
-            staff_combo.set("Sajin")
+            staff_combo.set("SAJIN")
             staff_combo.place(x=400, y=y_pos)
             staff_combo.place_forget()
             entries["Staff Name"] = staff_combo
@@ -421,18 +420,29 @@ def create_other_frame(parent):
             collected_data = {}
 
             # Desired order
-            ordered_fields = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount", "Cash Received",
-                "Balance", "Cash With", "Staff Name","Collection Type", "Collection Other Detail", "Remarks"]
-
             ordered_fields = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount","Cash Received", "Balance", "Cash With",
                 "Staff Name", "Cash Other Detail","Collection Type", "Collection Other Detail", "Remarks"]
+            cash_with_value = entries["Cash With"].get()
 
             for field in ordered_fields:
-                if field in entries:
-                    value = entries[field].get()
-                    if field == "Date":
-                        value = f"'{value}"
-                    collected_data[field] = value
+                if field not in entries:
+                    continue
+
+                # Skip Staff Name unless STAFF selected
+                if field == "Staff Name" and cash_with_value != "STAFF":
+                    collected_data[field] = ""
+                    continue
+
+                # Skip Cash Other Detail unless OTHERS selected
+                if field == "Cash Other Detail" and cash_with_value != "OTHERS":
+                    collected_data[field] = ""
+                    continue
+
+                value = entries[field].get()
+
+                if field == "Date":
+                    value = f"'{value}"
+                collected_data[field] = value
 
             print("Stored Data:", collected_data)
             save_to_excel(collected_data)
