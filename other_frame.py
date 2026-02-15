@@ -297,8 +297,7 @@ def create_other_frame(parent):
                 if len(value) != 10:
                     check_btn.configure(state="disabled")
                     return
-
-            elif field not in ["Cash With", "Collection Type", "Collection Other Detail", "Balance","Date"] and value == "":
+            elif field not in ["Cash With", "Collection Type", "Collection Other Detail","Cash Other Detail","Staff Name",  "Balance","Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
         check_btn.configure(state="normal")
