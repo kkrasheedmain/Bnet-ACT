@@ -4,10 +4,8 @@ from openpyxl import Workbook, load_workbook
 import os
 from datetime import datetime
 
-
-###########################
 def create_dscm_frame(parent):
-    dscm_frame = ctk.CTkFrame(parent, fg_color='grey')
+    dscm_frame = ctk.CTkFrame(parent, fg_color="#16A34A")
     dscm_frame.place(relwidth=1, relheight=1)
 
     # ✅ HEADING LABEL
@@ -31,7 +29,29 @@ def create_dscm_frame(parent):
         "Remarks"
     ]
     entries = {}
-    # ---------- FTTH VALIDATION ----------
+
+    # ---------- CASH WITH TOGGLES ----------
+    def toggle_staff_combo(choice):
+        if choice == "STAFF":
+            entries["Staff Name"].set("SAJIN")
+            entries["Staff Name"].place(x=400, y=entries["Cash With"].winfo_y())
+        else:
+            entries["Staff Name"].set("")  # ⭐ reset
+            entries["Staff Name"].place_forget()
+        validate_entries()
+
+    def toggle_cash_with_other_detail(choice):
+        if choice == "OTHERS":
+            entries["Cash Other Detail"].delete(0, "end")
+            entries["Cash Other Detail"].place(x=400, y=entries["Cash With"].winfo_y())
+        else:
+            entries["Cash Other Detail"].delete(0, "end")
+            entries["Cash Other Detail"].place_forget()
+        validate_entries()
+
+
+        # # ---------- FTTH VALIDATION ----------
+
     def validate_ftth(new_value):
         if new_value == "":
             return True
@@ -51,6 +71,7 @@ def create_dscm_frame(parent):
         if len(new_value) == 10:
             dscm_frame.after(10, lambda: entries["Name"].focus())
         return True
+
 
     # ---------- CONTACT VALIDATION ----------
     def validate_contact(new_value):
@@ -83,7 +104,7 @@ def create_dscm_frame(parent):
         except ValueError:
             return False
 
-    vcmd_ftth = (dscm_frame.register(validate_ftth), "%P")
+    vcmd_FTTH = (dscm_frame.register(validate_ftth), "%P")
     vcmd_contact = (dscm_frame.register(validate_contact), "%P")
     vcmd_amount = (dscm_frame.register(validate_amount), "%P")
 
@@ -115,7 +136,7 @@ def create_dscm_frame(parent):
                 fg_color="white",
                 text_color="black",
                 validate="key",
-                validatecommand=vcmd_ftth
+                validatecommand=vcmd_FTTH
             )
 
         elif field == "Contact No":
@@ -162,11 +183,48 @@ def create_dscm_frame(parent):
             widget = ctk.CTkComboBox(
                 dscm_frame,
                 width=200,
-                values=["COUNTER", "OFFICE-COLLECTION-ACCOUNT", "STAFF", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
+                values=[
+                    "COUNTER",
+                    "OFFICE-COLLECTION-ACCOUNT",
+                    "STAFF",
+                    "BETA-ACCOUNT",
+                    "CUSTOMER",
+                    "OTHERS"
+                ],
+                fg_color="white",
+                text_color="black",
+                command=lambda choice: (
+                    toggle_staff_combo(choice),
+                    toggle_cash_with_other_detail(choice),
+                    validate_entries()
+                )
+            )
+            widget.set("COUNTER")
+
+            # 🔹 Staff Combo
+            staff_combo = ctk.CTkComboBox(
+                dscm_frame,
+                width=200,
+                values=["SAFEER", "SAJIN", "MIDHUN", "BABU", "SIDARTH", "MINHA"],
                 fg_color="white",
                 text_color="black"
             )
-            widget.set("COUNTER")
+            staff_combo.set("SAJIN")
+            staff_combo.place(x=400, y=y_pos)
+            staff_combo.place_forget()
+            entries["Staff Name"] = staff_combo
+
+            # 🔹 Cash Other Detail Entry
+            cash_other_entry = ctk.CTkEntry(
+                dscm_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                placeholder_text="Enter details"
+            )
+            cash_other_entry.place(x=400, y=y_pos)
+            cash_other_entry.place_forget()
+            entries["Cash Other Detail"] = cash_other_entry
 
         else:
             widget = ctk.CTkEntry(
@@ -206,6 +264,8 @@ def create_dscm_frame(parent):
 
     # ---------- VALIDATION FUNCTION ----------
     def validate_entries():
+        cash_with_value = entries["Cash With"].get()
+
         for field, widget in entries.items():
             value = widget.get().strip()
 
@@ -214,10 +274,15 @@ def create_dscm_frame(parent):
                     check_btn.configure(state="disabled")
                     return
 
-            elif field not in ["Cash With", "Balance", "Date"] and value == "":
+            elif field not in ["Cash With","Cash Other Detail","Staff Name","Balance","Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
 
+        # 🔴 If Cash With = OTHERS → require detail
+        if cash_with_value == "OTHERS":
+            if not entries["Cash Other Detail"].get().strip():
+                check_btn.configure(state="disabled")
+                return
         check_btn.configure(state="normal")
 
     # ---------- DATE PICKER ----------
@@ -248,8 +313,6 @@ def create_dscm_frame(parent):
             command=select_date
         ).pack(pady=10)
 
-
-
     ### Create Excel Save Function
     def save_to_excel(data_dict):
         folder_path = "D:/BETA-SOFT"
@@ -274,15 +337,25 @@ def create_dscm_frame(parent):
         now = datetime.now()
         date_str = "'"+now.strftime("%d-%m-%Y")
         time_str = now.strftime("%H:%M:%S")
-        row_data = [date_str, time_str] + list(data_dict.values())
+        combined_value = (data_dict.get('Staff Name', '') + data_dict.get('Cash Other Detail', ''))
+        # Create new list excluding one of them
+        row = []
+        for key in data_dict:
+            if key == 'Staff Name':
+                row.append(combined_value)
+            elif key == 'Cash Other Detail':
+                continue  # Skip this since already combined
+            else:
+                row.append(data_dict[key])
+        row_data = [date_str, time_str] + row
         sheet.append(row_data)
         workbook.save(full_path)
 
     # ---------- CHECK BUTTON ACTION ----------
     def show_verification():
         popup = ctk.CTkToplevel(parent)
-        popup.title("DSCM VERIFICATION ")
-        popup.geometry("450x500")
+        popup.title("DSCM BILL COLLECTION ")
+        popup.geometry("450x660")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
         popup.resizable(False, False)
@@ -295,7 +368,7 @@ def create_dscm_frame(parent):
 
         title = ctk.CTkLabel(
             popup_frame,
-            text="DSCM COLLECTION VERIFICATION DETAILS",
+            text="DSCM BILL COLLECTION ",
             font=("Arial", 18, "bold")
         )
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
@@ -329,17 +402,41 @@ def create_dscm_frame(parent):
             command=popup.destroy
         ).pack(side="left", padx=10)
 
+
+        ####################
         def confirm_button_action():
             collected_data = {}
-            for field, widget in entries.items():
-                value = widget.get()
+
+            # Desired order
+            ordered_fields = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount","Cash Received", "Balance", "Cash With",
+                "Staff Name", "Cash Other Detail","Remarks"]
+            cash_with_value = entries["Cash With"].get()
+
+            for field in ordered_fields:
+                if field not in entries:
+                    continue
+
+                # Skip Staff Name unless STAFF selected
+                if field == "Staff Name" and cash_with_value != "STAFF":
+                    collected_data[field] = ""
+                    continue
+
+                # Skip Cash Other Detail unless OTHERS selected
+                if field == "Cash Other Detail" and cash_with_value != "OTHERS":
+                    collected_data[field] = ""
+                    continue
+
+                value = entries[field].get()
+
                 if field == "Date":
                     value = f"'{value}"
                 collected_data[field] = value
+
             print("Stored Data:", collected_data)
             save_to_excel(collected_data)
             popup.destroy()
             clear_entries()
+
             entries["FTTH No"].focus()
 
         ctk.CTkButton(
@@ -349,7 +446,6 @@ def create_dscm_frame(parent):
             fg_color="green",
             command=confirm_button_action
         ).pack(side="left", padx=10)
-
 
     # ---------- Buttons ----------
     check_btn = ctk.CTkButton(
@@ -364,13 +460,12 @@ def create_dscm_frame(parent):
     check_btn.place(x=60, y=y_pos + 20)
     for field, widget in entries.items():
         if field != "Cash With":
-            widget.bind("<KeyRelease>", lambda event: validate_entries())
+            widget.bind("<KeyRelease>", lambda event, f=field: validate_entries())
     entries["Date"].bind("<Button-1>", open_calendar)
 
     # Bind auto calculation
     entries["Bill Amount"].bind("<KeyRelease>", calculate_balance)
     entries["Cash Received"].bind("<KeyRelease>", calculate_balance)
-
 
     # ---------- FULL ENTER KEY NAVIGATION ----------
 
@@ -384,6 +479,7 @@ def create_dscm_frame(parent):
     ]
 
     def focus_next(event, current_field):
+        print("Current field:", current_field)
         if current_field in field_order:
             index = field_order.index(current_field)
             if index + 1 < len(field_order):
@@ -421,6 +517,16 @@ def create_dscm_frame(parent):
             # Reset combobox
             elif field == "Cash With":
                 widget.set("COUNTER")
+
+            elif field == "Cash Other Detail":
+                widget.delete(0, "end")
+                widget.place_forget()
+
+            elif field == "Staff Name":
+                widget.set("SAJIN")
+                widget.place_forget()
+
+
             # Normal entries
             else:
                 widget.delete(0, "end")
@@ -440,4 +546,3 @@ def create_dscm_frame(parent):
     ####################
 
     return dscm_frame
-
