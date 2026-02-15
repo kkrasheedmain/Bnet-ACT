@@ -336,7 +336,17 @@ def create_ctop_frame(parent):
         now = datetime.now()
         date_str = "'"+now.strftime("%d-%m-%Y")
         time_str = now.strftime("%H:%M:%S")
-        row_data = [date_str, time_str] + list(data_dict.values())
+        combined_value = (data_dict.get('Staff Name', '') + data_dict.get('Cash Other Detail', ''))
+        # Create new list excluding one of them
+        row = []
+        for key in data_dict:
+            if key == 'Staff Name':
+                row.append(combined_value)
+            elif key == 'Cash Other Detail':
+                continue  # Skip this since already combined
+            else:
+                row.append(data_dict[key])
+        row_data = [date_str, time_str] + row
         sheet.append(row_data)
         workbook.save(full_path)
 
@@ -391,21 +401,41 @@ def create_ctop_frame(parent):
             command=popup.destroy
         ).pack(side="left", padx=10)
 
-        ########################
-
 
         ####################
         def confirm_button_action():
             collected_data = {}
-            for field, widget in entries.items():
-                value = widget.get()
+
+            # Desired order
+            ordered_fields = ["Date", "Mobile No", "Name", "Contact No", "Bill Amount","Cash Received", "Balance", "Cash With",
+                "Staff Name", "Cash Other Detail","Remarks"]
+            cash_with_value = entries["Cash With"].get()
+
+            for field in ordered_fields:
+                if field not in entries:
+                    continue
+
+                # Skip Staff Name unless STAFF selected
+                if field == "Staff Name" and cash_with_value != "STAFF":
+                    collected_data[field] = ""
+                    continue
+
+                # Skip Cash Other Detail unless OTHERS selected
+                if field == "Cash Other Detail" and cash_with_value != "OTHERS":
+                    collected_data[field] = ""
+                    continue
+
+                value = entries[field].get()
+
                 if field == "Date":
                     value = f"'{value}"
                 collected_data[field] = value
+
             print("Stored Data:", collected_data)
             save_to_excel(collected_data)
             popup.destroy()
             clear_entries()
+
             entries["Mobile No"].focus()
 
         ctk.CTkButton(
