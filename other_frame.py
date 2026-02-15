@@ -44,12 +44,19 @@ def create_other_frame(parent):
             entries["Staff Name"].set("SAJIN")  # reset silently
             entries["Staff Name"].place_forget()
 
-    def toggle_other_detail(choice):
+    def toggle_coll_type_other_detail(choice): # FOR COLLECTION TYPE -OTHERS
         if choice == "OTHERS":
             entries["Collection Other Detail"].place(x=400,y=entries["Collection Type"].winfo_y())
         else:
             entries["Collection Other Detail"].delete(0, "end")
             entries["Collection Other Detail"].place_forget()
+
+    def toggle_cash_with_other_detail(choice): # FOR COLLECTION WITH = OTHERS
+        if choice == "OTHERS":
+            entries["Cash Other Detail"].place(x=400,y=entries["Cash With"].winfo_y()            )
+        else:
+            entries["Cash Other Detail"].delete(0, "end")
+            entries["Cash Other Detail"].place_forget()
 
     # ---------- FTTH VALIDATION ----------
     def validate_ftth(new_value):
@@ -176,33 +183,51 @@ def create_other_frame(parent):
                 text_color="black",
                 state="disabled"  # 🔒 Prevent manual editing
             )
-
-
         elif field == "Cash With":
             widget = ctk.CTkComboBox(
                 other_frame,
                 width=200,
-                values=["COUNTER", "OFFICE-COLLECTION-ACCOUNT", "STAFF", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
+                values=[
+                    "COUNTER",
+                    "OFFICE-COLLECTION-ACCOUNT",
+                    "STAFF",
+                    "BETA-ACCOUNT",
+                    "CUSTOMER",
+                    "OTHERS"
+                ],
                 fg_color="white",
                 text_color="black",
-                command=lambda choice: toggle_staff_combo(choice)
+                command=lambda choice: (
+                    toggle_staff_combo(choice),
+                    toggle_cash_with_other_detail(choice)
+                )
             )
             widget.set("COUNTER")
 
-            # 🔹 Hidden Staff ComboBox
+            # 🔹 Staff Combo (existing)
             staff_combo = ctk.CTkComboBox(
                 other_frame,
                 width=200,
-                values=["SAFEER", "SAJIN", "MIDHUN", "BABU", "SIDARTH", "MINHA","OTHER"],
+                values=["Safeer", "Sajin", "Midhun", "Babu", "Sidarth", "Minha"],
                 fg_color="white",
                 text_color="black"
             )
-            staff_combo.set("SAJIN")  # default value
+            staff_combo.set("Sajin")
             staff_combo.place(x=400, y=y_pos)
             staff_combo.place_forget()
-
             entries["Staff Name"] = staff_combo
 
+            # 🔹 Cash Other Detail Entry (NEW)
+            cash_other_entry = ctk.CTkEntry(
+                other_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                placeholder_text="Enter details"
+            )
+            cash_other_entry.place(x=400, y=y_pos)
+            cash_other_entry.place_forget()
+            entries["Cash Other Detail"] = cash_other_entry
 
         elif field == "Collection Type":
             widget = ctk.CTkComboBox(
@@ -211,7 +236,7 @@ def create_other_frame(parent):
                 values=["ADAPTOR","WIFI-ROUTER","FTTH-ONT","CABLING","RECONNECTION","SHIFTING","MAINTENANCE","PENALTY","OTHERS"],
                 fg_color="white",
                 text_color="black",
-                command = toggle_other_detail
+                command = toggle_coll_type_other_detail
                 )
             widget.set("ADAPTOR")  # default value
 
@@ -341,7 +366,7 @@ def create_other_frame(parent):
     def show_verification():
         popup = ctk.CTkToplevel(parent)
         popup.title("OTHER COLLECTION VERIFICATION ")
-        popup.geometry("450x620")
+        popup.geometry("450x660")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
         popup.resizable(False, False)
@@ -360,8 +385,8 @@ def create_other_frame(parent):
         title.grid(row=0, column=0, columnspan=2, pady=(10, 20))
 
         row = 1
-        popup_order = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount", "Cash Received",
-            "Balance", "Cash With", "Staff Name","Collection Type", "Collection Other Detail", "Remarks"]
+        popup_order = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount","Cash Received", "Balance", "Cash With",
+            "Staff Name", "Cash Other Detail","Collection Type", "Collection Other Detail", "Remarks"]
 
         for field in popup_order:
             if field in entries:
@@ -398,6 +423,9 @@ def create_other_frame(parent):
             # Desired order
             ordered_fields = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount", "Cash Received",
                 "Balance", "Cash With", "Staff Name","Collection Type", "Collection Other Detail", "Remarks"]
+
+            ordered_fields = ["Date", "FTTH No", "Name", "Contact No", "Bill Amount","Cash Received", "Balance", "Cash With",
+                "Staff Name", "Cash Other Detail","Collection Type", "Collection Other Detail", "Remarks"]
 
             for field in ordered_fields:
                 if field in entries:
@@ -491,9 +519,13 @@ def create_other_frame(parent):
             # Reset combobox
             elif field == "Cash With":
                 widget.set("COUNTER")
+            elif field == "Cash Other Detail":
+                widget.delete(0, "end")
+                widget.place_forget()
+
+
             elif field == "Collection Type":
                 widget.set("ADAPTOR")
-
             elif field == "Collection Other Detail":
                 widget.delete(0, "end")
                 widget.place_forget()
