@@ -66,7 +66,7 @@ if __name__ == '__main__':
     window = ctk.CTk()
     window.configure(fg_color="#1e90ff")
     window.title("One-Solution")
-    window.geometry("800x800")
+    window.geometry("900x900")
     window.iconbitmap("icon-Bharat BNET.ico")
     window.resizable(False, False)
 
