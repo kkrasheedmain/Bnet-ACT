@@ -30,7 +30,27 @@ def create_ctop_frame(parent):
     ]
     entries = {}
 
-    # # ---------- Mobile VALIDATION ----------
+    # ---------- CASH WITH TOGGLES ----------
+    def toggle_staff_combo(choice):
+        if choice == "STAFF":
+            entries["Staff Name"].set("SAJIN")
+            entries["Staff Name"].place(x=400, y=entries["Cash With"].winfo_y())
+        else:
+            entries["Staff Name"].set("")  # ⭐ reset
+            entries["Staff Name"].place_forget()
+        validate_entries()
+
+    def toggle_cash_with_other_detail(choice):
+        if choice == "OTHERS":
+            entries["Cash Other Detail"].delete(0, "end")
+            entries["Cash Other Detail"].place(x=400, y=entries["Cash With"].winfo_y())
+        else:
+            entries["Cash Other Detail"].delete(0, "end")
+            entries["Cash Other Detail"].place_forget()
+        validate_entries()
+
+
+        # # ---------- Mobile VALIDATION ----------
     def validate_mobile(new_value):
         if new_value == "":
             return True
@@ -162,11 +182,48 @@ def create_ctop_frame(parent):
             widget = ctk.CTkComboBox(
                 ctop_frame,
                 width=200,
-                values=["COUNTER", "OFFICE-COLLECTION-ACCOUNT", "STAFF", "BETA-ACCOUNT", "CUSTOMER", "OTHERS"],
+                values=[
+                    "COUNTER",
+                    "OFFICE-COLLECTION-ACCOUNT",
+                    "STAFF",
+                    "BETA-ACCOUNT",
+                    "CUSTOMER",
+                    "OTHERS"
+                ],
+                fg_color="white",
+                text_color="black",
+                command=lambda choice: (
+                    toggle_staff_combo(choice),
+                    toggle_cash_with_other_detail(choice),
+                    validate_entries()
+                )
+            )
+            widget.set("COUNTER")
+
+            # 🔹 Staff Combo
+            staff_combo = ctk.CTkComboBox(
+                ctop_frame,
+                width=200,
+                values=["SAFEER", "SAJIN", "MIDHUN", "BABU", "SIDARTH", "MINHA"],
                 fg_color="white",
                 text_color="black"
             )
-            widget.set("COUNTER")
+            staff_combo.set("SAJIN")
+            staff_combo.place(x=400, y=y_pos)
+            staff_combo.place_forget()
+            entries["Staff Name"] = staff_combo
+
+            # 🔹 Cash Other Detail Entry
+            cash_other_entry = ctk.CTkEntry(
+                ctop_frame,
+                width=200,
+                fg_color="white",
+                text_color="black",
+                placeholder_text="Enter details"
+            )
+            cash_other_entry.place(x=400, y=y_pos)
+            cash_other_entry.place_forget()
+            entries["Cash Other Detail"] = cash_other_entry
 
         else:
             widget = ctk.CTkEntry(
@@ -206,6 +263,8 @@ def create_ctop_frame(parent):
 
     # ---------- VALIDATION FUNCTION ----------
     def validate_entries():
+        cash_with_value = entries["Cash With"].get()
+
         for field, widget in entries.items():
             value = widget.get().strip()
 
@@ -214,10 +273,15 @@ def create_ctop_frame(parent):
                     check_btn.configure(state="disabled")
                     return
 
-            elif field not in ["Cash With", "Balance", "Date"] and value == "":
+            elif field not in ["Cash With","Cash Other Detail","Staff Name","Balance","Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
 
+        # 🔴 If Cash With = OTHERS → require detail
+        if cash_with_value == "OTHERS":
+            if not entries["Cash Other Detail"].get().strip():
+                check_btn.configure(state="disabled")
+                return
         check_btn.configure(state="normal")
 
     # ---------- DATE PICKER ----------
@@ -260,7 +324,7 @@ def create_ctop_frame(parent):
             workbook = load_workbook(full_path)
         else:
             workbook = Workbook()
-        # If sheet "dscm" exists → use it
+        # If sheet "ctop" exists → use it
         if "ctop" in workbook.sheetnames:
             sheet = workbook["ctop"]
         else:
@@ -280,7 +344,7 @@ def create_ctop_frame(parent):
     def show_verification():
         popup = ctk.CTkToplevel(parent)
         popup.title("MOBILE RECHARGE TOP-UP ")
-        popup.geometry("450x500")
+        popup.geometry("450x660")
         popup.transient(parent)
         popup.grab_set()  # 🔒 MODAL
         popup.resizable(False, False)
@@ -327,6 +391,10 @@ def create_ctop_frame(parent):
             command=popup.destroy
         ).pack(side="left", padx=10)
 
+        ########################
+
+
+        ####################
         def confirm_button_action():
             collected_data = {}
             for field, widget in entries.items():
@@ -361,7 +429,7 @@ def create_ctop_frame(parent):
     check_btn.place(x=60, y=y_pos + 20)
     for field, widget in entries.items():
         if field != "Cash With":
-            widget.bind("<KeyRelease>", lambda event: validate_entries())
+            widget.bind("<KeyRelease>", lambda event, f=field: validate_entries())
     entries["Date"].bind("<Button-1>", open_calendar)
 
     # Bind auto calculation
@@ -418,6 +486,16 @@ def create_ctop_frame(parent):
             # Reset combobox
             elif field == "Cash With":
                 widget.set("COUNTER")
+
+            elif field == "Cash Other Detail":
+                widget.delete(0, "end")
+                widget.place_forget()
+
+            elif field == "Staff Name":
+                widget.set("SAJIN")
+                widget.place_forget()
+
+
             # Normal entries
             else:
                 widget.delete(0, "end")
