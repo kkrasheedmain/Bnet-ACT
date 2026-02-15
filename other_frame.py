@@ -196,10 +196,7 @@ def create_other_frame(parent):
                 ],
                 fg_color="white",
                 text_color="black",
-                command=lambda choice: (
-                    toggle_staff_combo(choice),
-                    toggle_cash_with_other_detail(choice)
-                )
+                command=lambda choice: (toggle_staff_combo(choice),toggle_cash_with_other_detail(choice),validate_entries())
             )
             widget.set("COUNTER")
 
@@ -235,8 +232,8 @@ def create_other_frame(parent):
                 values=["ADAPTOR","WIFI-ROUTER","FTTH-ONT","CABLING","RECONNECTION","SHIFTING","MAINTENANCE","PENALTY","OTHERS"],
                 fg_color="white",
                 text_color="black",
-                command = toggle_coll_type_other_detail
-                )
+                command=lambda choice: (toggle_coll_type_other_detail(choice), validate_entries()))
+                #command = toggle_coll_type_other_detail)
             widget.set("ADAPTOR")  # default value
 
             # 🔹 Hidden entry for "OTHERS" details
@@ -290,16 +287,39 @@ def create_other_frame(parent):
 
     # ---------- VALIDATION FUNCTION ----------
     def validate_entries():
+        cash_with_value = entries["Cash With"].get()
+        collection_type_value = entries["Collection Type"].get()
+
         for field, widget in entries.items():
             value = widget.get().strip()
 
+            # 🔹 FTTH & Contact must be 10 digits
             if field in ["FTTH No", "Contact No"]:
                 if len(value) != 10:
                     check_btn.configure(state="disabled")
                     return
-            elif field not in ["Cash With", "Collection Type", "Collection Other Detail","Cash Other Detail","Staff Name",  "Balance","Date"] and value == "":
+
+            # 🔹 General mandatory fields
+            elif field not in ["Cash With","Collection Type","Collection Other Detail","Cash Other Detail","Staff Name",
+                "Balance","Date"] and value == "":
                 check_btn.configure(state="disabled")
                 return
+
+        # 🔴 NEW RULE 1:
+        # If Cash With = OTHERS → Cash Other Detail must not be empty
+        if cash_with_value == "OTHERS":
+            if not entries["Cash Other Detail"].get().strip():
+                check_btn.configure(state="disabled")
+                return
+
+        # 🔴 NEW RULE 2:
+        # If Collection Type = OTHERS → Collection Other Detail must not be empty
+        if collection_type_value == "OTHERS":
+            if not entries["Collection Other Detail"].get().strip():
+                check_btn.configure(state="disabled")
+                return
+
+        # ✅ If everything valid
         check_btn.configure(state="normal")
 
     # ---------- DATE PICKER ----------
@@ -486,6 +506,8 @@ def create_other_frame(parent):
     for field, widget in entries.items():
         if field != "Cash With":
             widget.bind("<KeyRelease>", lambda event: validate_entries())
+    entries["Cash Other Detail"].bind("<KeyRelease>",lambda e: validate_entries())
+    entries["Collection Other Detail"].bind("<KeyRelease>",lambda e: validate_entries())
     entries["Date"].bind("<Button-1>", open_calendar)
 
     # Bind auto calculation
