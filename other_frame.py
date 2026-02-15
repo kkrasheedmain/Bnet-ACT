@@ -356,7 +356,21 @@ def create_other_frame(parent):
         now = datetime.now()
         date_str = "'"+now.strftime("%d-%m-%Y")
         time_str = now.strftime("%H:%M:%S")
-        row_data = [date_str, time_str] + list(data_dict.values())
+        print("save_to_excel-Test point down - delete")
+        print(list(data_dict.values()))
+        # Concatenate the two specific fields - Corresponding to S'Staff Name' and 'Cash Other Detail'
+        combined_value = (data_dict.get('Staff Name', '') +data_dict.get('Cash Other Detail', ''))
+        # Create new list excluding one of them
+        row = []
+        for key in data_dict:
+            if key == 'Staff Name':
+                row.append(combined_value)
+            elif key == 'Cash Other Detail':
+                continue  # Skip this since already combined
+            else:
+                row.append(data_dict[key])
+
+        row_data = [date_str, time_str] + row
         sheet.append(row_data)
         workbook.save(full_path)
 
