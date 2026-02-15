@@ -35,12 +35,13 @@ def create_other_frame(parent):
 
     def toggle_staff_combo(choice):
         if choice == "STAFF":
+            entries["Staff Name"].set("SAJIN")  # ensure default
             entries["Staff Name"].place(
                 x=400,
                 y=entries["Cash With"].winfo_y()
             )
         else:
-            entries["Staff Name"].set("")
+            entries["Staff Name"].set("SAJIN")  # reset silently
             entries["Staff Name"].place_forget()
 
     def toggle_other_detail(choice):
@@ -192,10 +193,11 @@ def create_other_frame(parent):
             staff_combo = ctk.CTkComboBox(
                 other_frame,
                 width=200,
-                values=["Safeer", "Sajin", "Midhun", "Babu", "Sidarth", "Minha"],
+                values=["SAFEER", "SAJIN", "MIDHUN", "BABU", "SIDARTH", "MINHA","OTHER"],
                 fg_color="white",
                 text_color="black"
             )
+            staff_combo.set("SAJIN")  # default value
             staff_combo.place(x=400, y=y_pos)
             staff_combo.place_forget()
 
@@ -497,7 +499,7 @@ def create_other_frame(parent):
                 widget.place_forget()
 
             elif field == "Staff Name":
-                widget.set("")
+                widget.set("SAJIN")  # restore default
                 widget.place_forget()
 
             # Normal entries
